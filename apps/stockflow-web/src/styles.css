@@ -17,6 +17,7 @@
   --warning: #C98A2C;
   --warning-10: #F6EBD8;
   
+  --icon-filter: none;
   --ink-900: #14161C;
   
   font-family: 'Inter', Arial, sans-serif;
@@ -79,5 +80,6 @@ button { cursor: pointer; }
   --danger-10: rgba(229, 84, 70, 0.15);
   --warning: #E09F3E;
   --warning-10: rgba(224, 159, 62, 0.15);
+  --icon-filter: brightness(0) invert(1);
   --ink-900: #F7F5F0;
 }
