@@ -1159,7 +1159,7 @@ export class DashboardComponent implements OnInit {
 
   private applyThemePreference(): void {
     document.documentElement.style.colorScheme = this.darkMode ? 'dark' : 'light';
-    document.body.style.backgroundColor = this.darkMode ? '#0d1422' : '';
+    document.body.style.backgroundColor = this.darkMode ? '#0A0A0C' : '';
   }
 
   private showTopbarToast(message: string): void {
@@ -1467,3 +1467,4 @@ export class DashboardComponent implements OnInit {
     return records.map(record => ({ ...record, ...this.prototype.recordPatch<T>(collection, id(record)) }));
   }
 }
+
