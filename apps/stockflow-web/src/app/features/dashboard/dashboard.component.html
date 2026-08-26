@@ -160,7 +160,7 @@
         </section>
 
         <section class="dashboard-grid">
-          <article class="card risk-overview">
+          <article class="card risk-overview clickable-card" (click)="selectView('risks')">
             <div class="card-header"><h2>Inventory Risk Overview</h2><div><select aria-label="Warehouse filter" [(ngModel)]="selectedWarehouseId" (ngModelChange)="onDashboardWarehouseChange()"><option value="">All Warehouses</option><option *ngFor="let warehouse of warehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }} · {{ warehouse.city }}</option></select><button>⋮</button></div></div>
             <div class="risk-body">
               <div class="donut-wrap"><div class="donut" [style.background]="riskDonutStyle()"><div><strong>{{ dashboard.riskTotal }}</strong><span>Total Alerts</span></div></div></div>
@@ -171,7 +171,7 @@
             <button class="card-cta" (click)="selectView('risks')">View All Risk Details <span>→</span></button>
           </article>
 
-          <article class="card top-risks">
+          <article class="card top-risks clickable-card" (click)="selectView('risks')">
             <div class="card-header"><h2>Top Operational Risks</h2><div><a (click)="selectView('risks')">View All</a><button>⋮</button></div></div>
             <div class="risk-list">
               <div *ngFor="let risk of dashboard.topRisks" class="risk-item">
@@ -184,7 +184,7 @@
 
 
 
-          <article class="card chart-card demand-card">
+          <article class="card chart-card demand-card clickable-card" (click)="selectView('demand')">
             <div class="card-header"><h2>Demand Forecast <small>(Current deterministic baseline)</small></h2><a (click)="selectView('demand')">View Full Forecast</a></div>
             <div class="chart-legend"><span><i class="actual-line"></i>Actual Demand</span><span><i class="forecast-line"></i>Forecast</span></div>
             <svg viewBox="0 0 360 190" preserveAspectRatio="none" class="line-chart" aria-label="Demand forecast chart">
@@ -196,7 +196,7 @@
             <div class="x-labels"><span *ngFor="let label of dashboard.demandForecast.labels">{{ label }}</span></div>
           </article>
 
-          <article class="card chart-card trend-card">
+          <article class="card chart-card trend-card clickable-card" (click)="selectView('inventory')">
             <div class="card-header"><h2>Inventory Value Snapshot</h2><select><option>Latest</option></select></div>
             <svg viewBox="0 0 260 190" preserveAspectRatio="none" class="line-chart trend-chart" aria-label="Inventory value trend chart">
               <defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8703D" stop-opacity=".28"/><stop offset="1" stop-color="var(--copper)" stop-opacity="0"/></linearGradient></defs>
@@ -207,7 +207,7 @@
             <div class="x-labels"><span *ngFor="let label of dashboard.inventoryTrend.labels">{{ label }}</span></div>
           </article>
 
-          <article class="card recommendations-card">
+          <article class="card recommendations-card clickable-card" (click)="selectView('recommendations')">
             <div class="card-header"><h2>Recommendations ({{ dashboard.recommendations.length }})</h2><a (click)="selectView('recommendations')">View All</a></div>
             <div class="recommendation-list">
               <div *ngFor="let recommendation of dashboard.recommendations" class="recommendation-item">
