@@ -1,0 +1,58 @@
+from pathlib import Path
+import json
+root=Path(__file__).resolve().parents[1]
+required=[
+ 'apps/stockflow-web/package.json',
+ 'apps/stockflow-web/angular.json',
+ 'apps/stockflow-web/src/main.ts',
+ 'apps/stockflow-web/src/app/features/dashboard/dashboard.component.ts',
+ 'apps/stockflow-web/src/assets/mock/dashboard-overview.json',
+ 'services/stockflow-core-api/pom.xml',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/StockFlowApplication.kt',
+ 'services/forecasting-service/src/stockflow_forecasting/main.py',
+ 'services/optimisation-service/src/stockflow_optimisation/main.py',
+ 'mcp/stockflow_mcp/data_server.py',
+ 'mcp/stockflow_mcp/intelligence_server.py',
+ 'mcp/stockflow_mcp/action_server.py',
+ 'data/generator_config.yaml',
+ 'contracts/dashboard-api.openapi.yaml',
+ 'services/stockflow-core-api/src/main/resources/application-sprint1.yml',
+ 'services/stockflow-core-api/src/main/resources/application-dev.yml',
+ 'services/stockflow-core-api/src/main/resources/application-prod.yml',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V001__create_tenants.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V002__create_warehouses.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V003__create_products_and_skus.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V004__create_batch_inventory.sql',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/foundation/api/FoundationController.kt',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/foundation/application/FoundationQueryService.kt',
+ 'docs/PHASE2_INCREMENT1_DATABASE_FOUNDATION.md',
+ 'services/stockflow-core-api/src/main/resources/application-phase2.yml',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V006__align_foundation_with_synthetic_data.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V007__create_import_tracking.sql',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/imports/api/ImportController.kt',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/imports/application/SyntheticFoundationImportService.kt',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/imports/persistence/ImportJobEntity.kt',
+ 'services/stockflow-core-api/src/test/kotlin/com/stockflow/imports/api/ImportControllerTest.kt',
+ 'data/import/StockFlow_AI_Synthetic_Foundation_Phase2_Ready.zip',
+ 'docs/SYNTHETIC_DATA_ASSESSMENT.md',
+ 'docs/PHASE2_INCREMENT2_CONTROLLED_IMPORT.md',
+ 'run-core-api-phase2-import-windows.cmd',
+ 'scripts/prepare_phase2_foundation_import.py',
+ 'scripts/validate_phase2_foundation_package.py',
+ 'scripts/postgres/setup_phase2_import_database.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V008__create_retailers_and_sales_history.sql',
+ 'services/stockflow-core-api/src/main/resources/db/migration/V009__add_inventory_intelligence_indexes.sql',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/analytics/api/DemandAnalyticsController.kt',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/risk/api/InventoryRiskController.kt',
+ 'services/stockflow-core-api/src/main/kotlin/com/stockflow/dashboard/application/DashboardDtos.kt',
+ 'services/stockflow-core-api/src/test/kotlin/com/stockflow/analytics/api/DemandAnalyticsControllerTest.kt',
+ 'services/stockflow-core-api/src/test/kotlin/com/stockflow/risk/api/InventoryRiskControllerTest.kt',
+ 'data/import/StockFlow_AI_Synthetic_Sales_Phase2_Ready.zip',
+ 'docs/PHASE2_INCREMENT3_SALES_ANALYTICS.md',
+ 'docs/PHASE2_INCREMENT4_INVENTORY_INTELLIGENCE.md',
+ 'StockFlow_AI_Phase2_Increment4_Apply_and_Run.md'
+]
+missing=[p for p in required if not (root/p).exists()]
+json.loads((root/'apps/stockflow-web/src/assets/mock/dashboard-overview.json').read_text(encoding='utf-8'))
+print(json.dumps({'valid':not missing,'missing':missing,'checked':len(required)},indent=2))
+if missing: raise SystemExit(1)

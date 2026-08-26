@@ -1,0 +1,25 @@
+{
+  "increment": "Phase 3 Increment 5B.1",
+  "name": "Forecast Calibration and Diagnostics",
+  "validation_date": "2026-08-02",
+  "production_kotlin_stub_compilation": "PASS",
+  "domain_algorithm_smoke_test": "PASS",
+  "smoke_test_details": {
+    "adi_cv2_profile": "PASS",
+    "croston_classic": "PASS",
+    "croston_sba": "PASS",
+    "tsb": "PASS",
+    "weekly_aggregation": "PASS",
+    "weekly_to_daily_disaggregation": "PASS"
+  },
+  "flyway_migration_static_review": "PASS",
+  "openapi_contract_updated": "PASS",
+  "full_maven_spring_h2_postgresql_test": "TO_BE_RUN_ON_PROJECT_MACHINE",
+  "reason": "The packaging runtime does not contain Maven and the project dependency cache. The supplied launcher runs clean test before starting the API.",
+  "new_migration": "V012__add_forecast_calibration_and_diagnostics.sql",
+  "new_endpoints": [
+    "GET /api/v1/forecasts/diagnostics",
+    "GET /api/v1/forecasts/diagnostics/{warehouseId}/{skuId}",
+    "GET /api/v1/forecasts/calibration-summary"
+  ]
+}

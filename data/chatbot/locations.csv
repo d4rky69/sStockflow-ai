@@ -1,0 +1,275 @@
+location_code,city,village,district,state,warehouse,aliases
+LOC0001,Visakhapatnam,,Visakhapatnam,Andhra Pradesh,WH-AP-001,Vizag|Waltair
+LOC0002,Vijayawada,,NTR,Andhra Pradesh,WH-AP-002,Bezawada
+LOC0003,Guntur,,Guntur,Andhra Pradesh,WH-AP-003,
+LOC0004,Tirupati,,Tirupati,Andhra Pradesh,WH-AP-004,Tirupathi
+LOC0005,Kurnool,,Kurnool,Andhra Pradesh,WH-AP-005,Kurnul
+LOC0006,Nellore,,SPSR Nellore,Andhra Pradesh,WH-AP-006,Sri Potti Sriramulu Nellore
+LOC0007,Kadapa,,YSR Kadapa,Andhra Pradesh,WH-AP-007,Cuddapah
+LOC0008,Anantapur,,Anantapur,Andhra Pradesh,WH-AP-008,Ananthapuramu
+LOC0009,Rajahmundry,,East Godavari,Andhra Pradesh,WH-AP-009,Rajamahendravaram
+LOC0010,Kakinada,,Kakinada,Andhra Pradesh,WH-AP-010,
+LOC0011,Eluru,,Eluru,Andhra Pradesh,WH-AP-011,
+LOC0012,Chittoor,,Chittoor,Andhra Pradesh,WH-AP-012,
+LOC0013,Srikakulam,,Srikakulam,Andhra Pradesh,WH-AP-013,
+LOC0014,Ongole,,Prakasam,Andhra Pradesh,WH-AP-014,
+LOC0015,Itanagar,,Papum Pare,Arunachal Pradesh,WH-AP-015,
+LOC0016,Naharlagun,,Papum Pare,Arunachal Pradesh,WH-AP-016,
+LOC0017,Tawang,,Tawang,Arunachal Pradesh,WH-AP-017,
+LOC0018,Ziro,,Lower Subansiri,Arunachal Pradesh,WH-AP-018,
+LOC0019,Pasighat,,East Siang,Arunachal Pradesh,WH-AP-019,
+LOC0020,Guwahati,,Kamrup Metropolitan,Assam,WH-A-001,Gauhati
+LOC0021,Dibrugarh,,Dibrugarh,Assam,WH-A-002,
+LOC0022,Silchar,,Cachar,Assam,WH-A-003,
+LOC0023,Jorhat,,Jorhat,Assam,WH-A-004,
+LOC0024,Nagaon,,Nagaon,Assam,WH-A-005,
+LOC0025,Tezpur,,Sonitpur,Assam,WH-A-006,
+LOC0026,Tinsukia,,Tinsukia,Assam,WH-A-007,
+LOC0027,Bongaigaon,,Bongaigaon,Assam,WH-A-008,
+LOC0028,Karimganj,,Karimganj,Assam,WH-A-009,
+LOC0029,Patna,,Patna,Bihar,WH-B-001,
+LOC0030,Gaya,,Gaya,Bihar,WH-B-002,
+LOC0031,Bhagalpur,,Bhagalpur,Bihar,WH-B-003,
+LOC0032,Muzaffarpur,,Muzaffarpur,Bihar,WH-B-004,
+LOC0033,Darbhanga,,Darbhanga,Bihar,WH-B-005,
+LOC0034,Purnia,,Purnia,Bihar,WH-B-006,Purnea
+LOC0035,Ara,,Bhojpur,Bihar,WH-B-007,Arrah
+LOC0036,Begusarai,,Begusarai,Bihar,WH-B-008,
+LOC0037,Chapra,,Saran,Bihar,WH-B-009,
+LOC0038,Katihar,,Katihar,Bihar,WH-B-010,
+LOC0039,Munger,,Munger,Bihar,WH-B-011,Monghyr
+LOC0040,Nalanda,,Nalanda,Bihar,WH-B-012,Bihar Sharif
+LOC0041,Motihari,,East Champaran,Bihar,WH-B-013,
+LOC0042,Siwan,,Siwan,Bihar,WH-B-014,
+LOC0043,Raipur,,Raipur,Chhattisgarh,WH-C-001,
+LOC0044,Bhilai,,Durg,Chhattisgarh,WH-C-002,
+LOC0045,Bilaspur,,Bilaspur,Chhattisgarh,WH-C-003,
+LOC0046,Korba,,Korba,Chhattisgarh,WH-C-004,
+LOC0047,Durg,,Durg,Chhattisgarh,WH-C-005,
+LOC0048,Rajnandgaon,,Rajnandgaon,Chhattisgarh,WH-C-006,
+LOC0049,Jagdalpur,,Bastar,Chhattisgarh,WH-C-007,
+LOC0050,Ambikapur,,Surguja,Chhattisgarh,WH-C-008,
+LOC0051,Panaji,,North Goa,Goa,WH-G-001,Panjim
+LOC0052,Margao,,South Goa,Goa,WH-G-002,Madgaon
+LOC0053,Vasco da Gama,,South Goa,Goa,WH-G-003,Vasco
+LOC0054,Mapusa,,North Goa,Goa,WH-G-004,
+LOC0055,Ahmedabad,,Ahmedabad,Gujarat,WH-G-005,Amdavad
+LOC0056,Surat,,Surat,Gujarat,WH-G-006,
+LOC0057,Vadodara,,Vadodara,Gujarat,WH-G-007,Baroda
+LOC0058,Rajkot,,Rajkot,Gujarat,WH-G-008,
+LOC0059,Bhavnagar,,Bhavnagar,Gujarat,WH-G-009,
+LOC0060,Jamnagar,,Jamnagar,Gujarat,WH-G-010,
+LOC0061,Junagadh,,Junagadh,Gujarat,WH-G-011,
+LOC0062,Gandhinagar,,Gandhinagar,Gujarat,WH-G-012,
+LOC0063,Anand,,Anand,Gujarat,WH-G-013,
+LOC0064,Nadiad,,Kheda,Gujarat,WH-G-014,
+LOC0065,Bharuch,,Bharuch,Gujarat,WH-G-015,
+LOC0066,Mehsana,,Mehsana,Gujarat,WH-G-016,
+LOC0067,Kutch-Bhuj,,Kutch,Gujarat,WH-G-017,Bhuj
+LOC0068,Navsari,,Navsari,Gujarat,WH-G-018,
+LOC0069,Valsad,,Valsad,Gujarat,WH-G-019,
+LOC0070,Gurugram,,Gurugram,Haryana,WH-H-001,Gurgaon
+LOC0071,Faridabad,,Faridabad,Haryana,WH-H-002,
+LOC0072,Panipat,,Panipat,Haryana,WH-H-003,
+LOC0073,Ambala,,Ambala,Haryana,WH-H-004,
+LOC0074,Karnal,,Karnal,Haryana,WH-H-005,
+LOC0075,Hisar,,Hisar,Haryana,WH-H-006,Hissar
+LOC0076,Rohtak,,Rohtak,Haryana,WH-H-007,
+LOC0077,Sonipat,,Sonipat,Haryana,WH-H-008,Sonepat
+LOC0078,Yamunanagar,,Yamunanagar,Haryana,WH-H-009,
+LOC0079,Panchkula,,Panchkula,Haryana,WH-H-010,
+LOC0080,Sirsa,,Sirsa,Haryana,WH-H-011,
+LOC0081,Shimla,,Shimla,Himachal Pradesh,WH-HP-001,
+LOC0082,Dharamshala,,Kangra,Himachal Pradesh,WH-HP-002,Dharamsala
+LOC0083,Mandi,,Mandi,Himachal Pradesh,WH-HP-003,
+LOC0084,Solan,,Solan,Himachal Pradesh,WH-HP-004,
+LOC0085,Kullu,,Kullu,Himachal Pradesh,WH-HP-005,
+LOC0086,Hamirpur,,Hamirpur,Himachal Pradesh,WH-HP-006,
+LOC0087,Una,,Una,Himachal Pradesh,WH-HP-007,
+LOC0088,Bilaspur-HP,,Bilaspur,Himachal Pradesh,WH-HP-008,Bilaspur HP
+LOC0089,Ranchi,,Ranchi,Jharkhand,WH-J-001,
+LOC0090,Jamshedpur,,East Singhbhum,Jharkhand,WH-J-002,Tatanagar
+LOC0091,Dhanbad,,Dhanbad,Jharkhand,WH-J-003,
+LOC0092,Bokaro,,Bokaro,Jharkhand,WH-J-004,
+LOC0093,Deoghar,,Deoghar,Jharkhand,WH-J-005,
+LOC0094,Hazaribagh,,Hazaribagh,Jharkhand,WH-J-006,Hazaribag
+LOC0095,Giridih,,Giridih,Jharkhand,WH-J-007,
+LOC0096,Bengaluru,,Bengaluru Urban,Karnataka,WH-K-001,Bangalore
+LOC0097,Mysuru,,Mysuru,Karnataka,WH-K-002,Mysore
+LOC0098,Hubballi,,Dharwad,Karnataka,WH-K-003,Hubli
+LOC0099,Mangaluru,,Dakshina Kannada,Karnataka,WH-K-004,Mangalore
+LOC0100,Belagavi,,Belagavi,Karnataka,WH-K-005,Belgaum
+LOC0101,Kalaburagi,,Kalaburagi,Karnataka,WH-K-006,Gulbarga
+LOC0102,Davanagere,,Davanagere,Karnataka,WH-K-007,
+LOC0103,Ballari,,Ballari,Karnataka,WH-K-008,Bellary
+LOC0104,Shivamogga,,Shivamogga,Karnataka,WH-K-009,Shimoga
+LOC0105,Tumakuru,,Tumakuru,Karnataka,WH-K-010,Tumkur
+LOC0106,Udupi,,Udupi,Karnataka,WH-K-011,
+LOC0107,Bidar,,Bidar,Karnataka,WH-K-012,
+LOC0108,Hassan,,Hassan,Karnataka,WH-K-013,
+LOC0109,Thiruvananthapuram,,Thiruvananthapuram,Kerala,WH-K-014,Trivandrum
+LOC0110,Kochi,,Ernakulam,Kerala,WH-K-015,Cochin
+LOC0111,Kozhikode,,Kozhikode,Kerala,WH-K-016,Calicut
+LOC0112,Thrissur,,Thrissur,Kerala,WH-K-017,Trichur
+LOC0113,Kollam,,Kollam,Kerala,WH-K-018,Quilon
+LOC0114,Kannur,,Kannur,Kerala,WH-K-019,Cannanore
+LOC0115,Alappuzha,,Alappuzha,Kerala,WH-K-020,Alleppey
+LOC0116,Kottayam,,Kottayam,Kerala,WH-K-021,
+LOC0117,Palakkad,,Palakkad,Kerala,WH-K-022,Palghat
+LOC0118,Malappuram,,Malappuram,Kerala,WH-K-023,
+LOC0119,Idukki,,Idukki,Kerala,WH-K-024,
+LOC0120,Bhopal,,Bhopal,Madhya Pradesh,WH-MP-001,
+LOC0121,Indore,,Indore,Madhya Pradesh,WH-MP-002,
+LOC0122,Jabalpur,,Jabalpur,Madhya Pradesh,WH-MP-003,
+LOC0123,Gwalior,,Gwalior,Madhya Pradesh,WH-MP-004,
+LOC0124,Ujjain,,Ujjain,Madhya Pradesh,WH-MP-005,
+LOC0125,Sagar,,Sagar,Madhya Pradesh,WH-MP-006,
+LOC0126,Dewas,,Dewas,Madhya Pradesh,WH-MP-007,
+LOC0127,Satna,,Satna,Madhya Pradesh,WH-MP-008,
+LOC0128,Ratlam,,Ratlam,Madhya Pradesh,WH-MP-009,
+LOC0129,Rewa,,Rewa,Madhya Pradesh,WH-MP-010,
+LOC0130,Chhindwara,,Chhindwara,Madhya Pradesh,WH-MP-011,
+LOC0131,Katni,,Katni,Madhya Pradesh,WH-MP-012,
+LOC0132,Mumbai,,Mumbai City,Maharashtra,WH-M-001,Bombay
+LOC0133,Pune,,Pune,Maharashtra,WH-M-002,Poona
+LOC0134,Nagpur,,Nagpur,Maharashtra,WH-M-003,
+LOC0135,Nashik,,Nashik,Maharashtra,WH-M-004,Nasik
+LOC0136,Aurangabad,,Chhatrapati Sambhajinagar,Maharashtra,WH-M-005,Sambhajinagar
+LOC0137,Solapur,,Solapur,Maharashtra,WH-M-006,
+LOC0138,Amravati,,Amravati,Maharashtra,WH-M-007,
+LOC0139,Kolhapur,,Kolhapur,Maharashtra,WH-M-008,
+LOC0140,Thane,,Thane,Maharashtra,WH-M-009,
+LOC0141,Nanded,,Nanded,Maharashtra,WH-M-010,
+LOC0142,Sangli,,Sangli,Maharashtra,WH-M-011,
+LOC0143,Jalgaon,,Jalgaon,Maharashtra,WH-M-012,
+LOC0144,Akola,,Akola,Maharashtra,WH-M-013,
+LOC0145,Latur,,Latur,Maharashtra,WH-M-014,
+LOC0146,Satara,,Satara,Maharashtra,WH-M-015,
+LOC0147,Imphal,,Imphal West,Manipur,WH-M-016,
+LOC0148,Thoubal,,Thoubal,Manipur,WH-M-017,
+LOC0149,Churachandpur,,Churachandpur,Manipur,WH-M-018,
+LOC0150,Shillong,,East Khasi Hills,Meghalaya,WH-M-019,
+LOC0151,Tura,,West Garo Hills,Meghalaya,WH-M-020,
+LOC0152,Jowai,,West Jaintia Hills,Meghalaya,WH-M-021,
+LOC0153,Aizawl,,Aizawl,Mizoram,WH-M-022,
+LOC0154,Lunglei,,Lunglei,Mizoram,WH-M-023,
+LOC0155,Kohima,,Kohima,Nagaland,WH-N-001,
+LOC0156,Dimapur,,Dimapur,Nagaland,WH-N-002,
+LOC0157,Bhubaneswar,,Khordha,Odisha,WH-O-001,
+LOC0158,Cuttack,,Cuttack,Odisha,WH-O-002,
+LOC0159,Rourkela,,Sundargarh,Odisha,WH-O-003,
+LOC0160,Berhampur,,Ganjam,Odisha,WH-O-004,Brahmapur
+LOC0161,Sambalpur,,Sambalpur,Odisha,WH-O-005,
+LOC0162,Puri,,Puri,Odisha,WH-O-006,
+LOC0163,Balasore,,Balasore,Odisha,WH-O-007,Baleswar
+LOC0164,Bhadrak,,Bhadrak,Odisha,WH-O-008,
+LOC0165,Ludhiana,,Ludhiana,Punjab,WH-P-001,
+LOC0166,Amritsar,,Amritsar,Punjab,WH-P-002,
+LOC0167,Jalandhar,,Jalandhar,Punjab,WH-P-003,Jullundur
+LOC0168,Patiala,,Patiala,Punjab,WH-P-004,
+LOC0169,Bathinda,,Bathinda,Punjab,WH-P-005,Bhatinda
+LOC0170,Mohali,,SAS Nagar,Punjab,WH-P-006,Sahibzada Ajit Singh Nagar
+LOC0171,Hoshiarpur,,Hoshiarpur,Punjab,WH-P-007,
+LOC0172,Firozpur,,Firozpur,Punjab,WH-P-008,Ferozepur
+LOC0173,Moga,,Moga,Punjab,WH-P-009,
+LOC0174,Jaipur,,Jaipur,Rajasthan,WH-R-001,
+LOC0175,Jodhpur,,Jodhpur,Rajasthan,WH-R-002,
+LOC0176,Udaipur,,Udaipur,Rajasthan,WH-R-003,
+LOC0177,Kota,,Kota,Rajasthan,WH-R-004,
+LOC0178,Ajmer,,Ajmer,Rajasthan,WH-R-005,
+LOC0179,Bikaner,,Bikaner,Rajasthan,WH-R-006,
+LOC0180,Alwar,,Alwar,Rajasthan,WH-R-007,
+LOC0181,Bharatpur,,Bharatpur,Rajasthan,WH-R-008,
+LOC0182,Sikar,,Sikar,Rajasthan,WH-R-009,
+LOC0183,Bhilwara,,Bhilwara,Rajasthan,WH-R-010,
+LOC0184,Pali,,Pali,Rajasthan,WH-R-011,
+LOC0185,Sri Ganganagar,,Sri Ganganagar,Rajasthan,WH-R-012,Ganganagar
+LOC0186,Gangtok,,East Sikkim,Sikkim,WH-S-001,
+LOC0187,Namchi,,South Sikkim,Sikkim,WH-S-002,
+LOC0188,Chennai,,Chennai,Tamil Nadu,WH-TN-001,Madras
+LOC0189,Coimbatore,,Coimbatore,Tamil Nadu,WH-TN-002,Kovai
+LOC0190,Madurai,,Madurai,Tamil Nadu,WH-TN-003,
+LOC0191,Tiruchirappalli,,Tiruchirappalli,Tamil Nadu,WH-TN-004,Trichy
+LOC0192,Salem,,Salem,Tamil Nadu,WH-TN-005,
+LOC0193,Tirunelveli,,Tirunelveli,Tamil Nadu,WH-TN-006,
+LOC0194,Erode,,Erode,Tamil Nadu,WH-TN-007,
+LOC0195,Vellore,,Vellore,Tamil Nadu,WH-TN-008,
+LOC0196,Thoothukudi,,Thoothukudi,Tamil Nadu,WH-TN-009,Tuticorin
+LOC0197,Dindigul,,Dindigul,Tamil Nadu,WH-TN-010,
+LOC0198,Thanjavur,,Thanjavur,Tamil Nadu,WH-TN-011,Tanjore
+LOC0199,Tiruppur,,Tiruppur,Tamil Nadu,WH-TN-012,
+LOC0200,Hyderabad,,Hyderabad,Telangana,WH-T-001,
+LOC0201,Warangal,,Warangal,Telangana,WH-T-002,
+LOC0202,Nizamabad,,Nizamabad,Telangana,WH-T-003,
+LOC0203,Karimnagar,,Karimnagar,Telangana,WH-T-004,
+LOC0204,Khammam,,Khammam,Telangana,WH-T-005,
+LOC0205,Mahbubnagar,,Mahabubnagar,Telangana,WH-T-006,
+LOC0206,Nalgonda,,Nalgonda,Telangana,WH-T-007,
+LOC0207,Secunderabad,,Hyderabad,Telangana,WH-T-008,
+LOC0208,Agartala,,West Tripura,Tripura,WH-T-009,
+LOC0209,Udaipur-TR,,Gomati,Tripura,WH-T-010,Udaipur Tripura
+LOC0210,Lucknow,,Lucknow,Uttar Pradesh,WH-UP-001,
+LOC0211,Kanpur,,Kanpur Nagar,Uttar Pradesh,WH-UP-002,
+LOC0212,Ghaziabad,,Ghaziabad,Uttar Pradesh,WH-UP-003,
+LOC0213,Agra,,Agra,Uttar Pradesh,WH-UP-004,
+LOC0214,Varanasi,,Varanasi,Uttar Pradesh,WH-UP-005,Banaras|Benares
+LOC0215,Meerut,,Meerut,Uttar Pradesh,WH-UP-006,
+LOC0216,Prayagraj,,Prayagraj,Uttar Pradesh,WH-UP-007,Allahabad
+LOC0217,Bareilly,,Bareilly,Uttar Pradesh,WH-UP-008,
+LOC0218,Aligarh,,Aligarh,Uttar Pradesh,WH-UP-009,
+LOC0219,Moradabad,,Moradabad,Uttar Pradesh,WH-UP-010,
+LOC0220,Saharanpur,,Saharanpur,Uttar Pradesh,WH-UP-011,
+LOC0221,Gorakhpur,,Gorakhpur,Uttar Pradesh,WH-UP-012,
+LOC0222,Noida,,Gautam Buddha Nagar,Uttar Pradesh,WH-UP-013,
+LOC0223,Firozabad,,Firozabad,Uttar Pradesh,WH-UP-014,
+LOC0224,Jhansi,,Jhansi,Uttar Pradesh,WH-UP-015,
+LOC0225,Muzaffarnagar,,Muzaffarnagar,Uttar Pradesh,WH-UP-016,
+LOC0226,Mathura,,Mathura,Uttar Pradesh,WH-UP-017,
+LOC0227,Rampur,,Rampur,Uttar Pradesh,WH-UP-018,
+LOC0228,Shahjahanpur,,Shahjahanpur,Uttar Pradesh,WH-UP-019,
+LOC0229,Faizabad,,Ayodhya,Uttar Pradesh,WH-UP-020,Ayodhya
+LOC0230,Dehradun,,Dehradun,Uttarakhand,WH-U-001,
+LOC0231,Haridwar,,Haridwar,Uttarakhand,WH-U-002,
+LOC0232,Nainital,,Nainital,Uttarakhand,WH-U-003,
+LOC0233,Roorkee,,Haridwar,Uttarakhand,WH-U-004,
+LOC0234,Haldwani,,Nainital,Uttarakhand,WH-U-005,
+LOC0235,Rudrapur,,Udham Singh Nagar,Uttarakhand,WH-U-006,
+LOC0236,Kolkata,,Kolkata,West Bengal,WH-WB-001,Calcutta
+LOC0237,Howrah,,Howrah,West Bengal,WH-WB-002,Haora
+LOC0238,Durgapur,,Paschim Bardhaman,West Bengal,WH-WB-003,
+LOC0239,Asansol,,Paschim Bardhaman,West Bengal,WH-WB-004,
+LOC0240,Siliguri,,Darjeeling,West Bengal,WH-WB-005,
+LOC0241,Malda,,Malda,West Bengal,WH-WB-006,English Bazar
+LOC0242,Kharagpur,,Paschim Medinipur,West Bengal,WH-WB-007,
+LOC0243,Bardhaman,,Purba Bardhaman,West Bengal,WH-WB-008,Burdwan
+LOC0244,Darjeeling,,Darjeeling,West Bengal,WH-WB-009,
+LOC0245,Cooch Behar,,Cooch Behar,West Bengal,WH-WB-010,Koch Bihar
+LOC0246,Port Blair,,South Andaman,Andaman and Nicobar Islands,WH-AAN-001,
+LOC0247,Chandigarh,,Chandigarh,Chandigarh,WH-C-009,
+LOC0248,Silvassa,,Dadra and Nagar Haveli,Dadra and Nagar Haveli and Daman and Diu,WH-DAN-001,
+LOC0249,Daman,,Daman,Dadra and Nagar Haveli and Daman and Diu,WH-DAN-002,
+LOC0250,Diu,,Diu,Dadra and Nagar Haveli and Daman and Diu,WH-DAN-003,
+LOC0251,New Delhi,,New Delhi,Delhi,WH-D-001,
+LOC0252,Dwarka,,South West Delhi,Delhi,WH-D-002,
+LOC0253,Rohini,,North West Delhi,Delhi,WH-D-003,
+LOC0254,Karol Bagh,,Central Delhi,Delhi,WH-D-004,
+LOC0255,Saket,,South Delhi,Delhi,WH-D-005,
+LOC0256,Srinagar,,Srinagar,Jammu and Kashmir,WH-JAK-001,
+LOC0257,Jammu,,Jammu,Jammu and Kashmir,WH-JAK-002,
+LOC0258,Anantnag,,Anantnag,Jammu and Kashmir,WH-JAK-003,
+LOC0259,Baramulla,,Baramulla,Jammu and Kashmir,WH-JAK-004,
+LOC0260,Leh,,Leh,Ladakh,WH-L-001,
+LOC0261,Kargil,,Kargil,Ladakh,WH-L-002,
+LOC0262,Kavaratti,,Lakshadweep,Lakshadweep,WH-L-003,
+LOC0263,Puducherry,,Puducherry,Puducherry,WH-P-010,Pondicherry
+LOC0264,Karaikal,,Karaikal,Puducherry,WH-P-011,
+LOC0265,,Shani Shingnapur,Ahmednagar,Maharashtra,WH-M-024,
+LOC0266,,Hivre Bazar,Ahmednagar,Maharashtra,WH-M-025,
+LOC0267,,Khonoma,Kohima,Nagaland,WH-N-003,
+LOC0268,,Mawlynnong,East Khasi Hills,Meghalaya,WH-M-026,
+LOC0269,,Punsari,Sabarkantha,Gujarat,WH-G-020,
+LOC0270,,Ralegan Siddhi,Ahmednagar,Maharashtra,WH-M-027,
+LOC0271,,Piplantri,Rajsamand,Rajasthan,WH-R-013,
+LOC0272,,Khimsar,Nagaur,Rajasthan,WH-R-014,
+LOC0273,,Kumbalangi,Ernakulam,Kerala,WH-K-025,
+LOC0274,,Nako,Kinnaur,Himachal Pradesh,WH-HP-009,

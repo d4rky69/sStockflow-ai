@@ -1,0 +1,7 @@
+dataset,field,value,unit,notes
+DEMO_SYNTHETIC,daily_demand_rate,0.08,units per available unit per day,Derived planning estimate until sales history is supplied
+DEMO_SYNTHETIC,lead_time_days,7,days,Demo replenishment lead time
+DEMO_SYNTHETIC,safety_stock_days,14,days,Demo safety-stock coverage
+DEMO_SYNTHETIC,default_unit_cost,100,INR per unit,Demo valuation fallback until product costs are supplied
+DEMO_SYNTHETIC,route_distance_default,550,km,Demo fallback for unsupported city pairs
+DEMO_SYNTHETIC,road_emission_factor,0.12,kgCO2e per tonne-km,Demo road factor

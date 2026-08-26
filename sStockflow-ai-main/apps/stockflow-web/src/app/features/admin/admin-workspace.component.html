@@ -1,0 +1,143 @@
+<section class="admin-page">
+  <header class="admin-heading">
+    <div>
+      <span class="eyebrow">{{ pageCopy.eyebrow }}</span>
+      <h1>{{ pageCopy.title }}</h1>
+      <p>{{ pageCopy.description }}</p>
+    </div>
+    <button type="button" class="primary-action" (click)="view === 'users' ? inviteUser() : saveSettings()">
+      <span>{{ view === 'users' ? '+' : '✓' }}</span>{{ pageCopy.action }}
+    </button>
+  </header>
+
+  <div class="prototype-note">
+    <span>INTERACTIVE PROTOTYPE</span>
+    <p>Role and setting changes are saved in this browser until the secured backend admin APIs are connected.</p>
+    <div class="prototype-save-state"><i></i><strong>{{ prototype.changeCount() }} saved changes</strong><small *ngIf="prototype.lastUpdatedAt()">Updated {{ prototype.lastUpdatedAt() | date:'shortTime' }}</small></div>
+  </div>
+
+  <ng-container *ngIf="view === 'users'">
+    <section class="metric-grid">
+      <article><i class="metric-icon violet">U</i><span>Total users</span><strong>{{ users.length }}</strong><small>Across {{ tenantLabel }}</small></article>
+      <article><i class="metric-icon green">A</i><span>Active now</span><strong>{{ activeUsers() }}</strong><small>{{ users.length - activeUsers() }} pending or suspended</small></article>
+      <article><i class="metric-icon blue">R</i><span>Custom roles</span><strong>{{ roles.length }}</strong><small>Permission sets configured</small></article>
+      <article><i class="metric-icon orange">M</i><span>MFA coverage</span><strong>{{ mfaCoverage() }}%</strong><small>{{ mfaEnabledUsers() }} of {{ users.length }} users protected</small></article>
+    </section>
+
+    <section class="user-layout">
+      <article class="panel users-panel">
+        <div class="panel-heading">
+          <div><span>TEAM DIRECTORY</span><h2>Workspace members</h2><p>Search is shared with the global header.</p></div>
+          <strong>{{ filteredUsers().length }} users</strong>
+        </div>
+        <div class="filter-row">
+          <label><span>Role</span><select [(ngModel)]="roleFilter"><option value="ALL">All roles</option><option *ngFor="let role of userRoles()" [value]="role">{{ role }}</option></select></label>
+          <label><span>Status</span><select [(ngModel)]="statusFilter"><option value="ALL">All statuses</option><option *ngFor="let status of statuses()" [value]="status">{{ status }}</option></select></label>
+          <button type="button" (click)="roleFilter = 'ALL'; statusFilter = 'ALL'">Clear filters</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Team member</th><th>Primary work</th><th>Secondary work</th><th>Status</th><th>Security</th><th>Activity</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers()">
+                <td><div class="user-cell"><i>{{ user.initials }}</i><span><strong>{{ user.name }} <em class="changed-marker" *ngIf="prototype.isChanged('users', user.id.toString())">Updated</em></strong><small>{{ user.email }}</small></span></div></td>
+                <td><select class="role-select" [ngModel]="user.primaryWork" (ngModelChange)="changeRole(user, $event)"><option *ngFor="let role of userRoles()" [value]="role">{{ role }}</option></select></td>
+                <td><strong>{{ user.secondaryWork }}</strong></td>
+                <td><span [class]="'status-pill ' + statusClass(user.status)">{{ user.status }}</span></td>
+                <td><span [class.secure]="user.mfa" class="security-pill">{{ user.mfa ? 'MFA on' : 'MFA off' }}</span></td>
+                <td><span class="muted">{{ user.lastActive }}</span></td>
+                <td><button type="button" class="row-action" (click)="toggleUserStatus(user)">{{ user.status === 'Active' ? 'Suspend' : 'Activate' }}</button></td>
+              </tr>
+              <tr *ngIf="!filteredUsers().length"><td colspan="7" class="empty-row">No users match the selected filters.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="panel role-panel">
+        <div class="panel-heading"><div><span>WORKSTREAM LIBRARY</span><h2>Team roles</h2><p>Finalized SIH responsibilities</p></div></div>
+        <div class="role-list">
+          <article *ngFor="let role of roles">
+            <i [class]="role.tone">{{ role.name.charAt(0) }}</i>
+            <div><div><strong>{{ role.name }}</strong><span>{{ role.users }} user</span></div><p>{{ role.description }}</p><small>{{ role.permissions.join(' · ') }}</small></div>
+          </article>
+        </div>
+        <button type="button" class="secondary-action" (click)="inviteUser()">+ Create custom role</button>
+      </aside>
+    </section>
+  </ng-container>
+
+  <ng-container *ngIf="view === 'settings'">
+    <section class="settings-layout">
+      <nav class="settings-nav panel" aria-label="Settings sections">
+        <button *ngFor="let section of settingsSections" type="button" [class.active]="activeSettingsSection === section.id" (click)="selectSettingsSection(section.id)"><i>{{ section.icon }}</i><span>{{ section.label }}</span><b>›</b></button>
+      </nav>
+
+      <div class="settings-content">
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'organization'">
+          <div class="panel-heading"><div><span>ORGANIZATION PROFILE</span><h2>Workspace details</h2><p>Defaults used across reports, workflows and exports.</p></div></div>
+          <div class="settings-form two-column">
+            <label class="wide"><span>Organization name</span><input [(ngModel)]="organizationName"></label>
+            <label><span>Timezone</span><select [(ngModel)]="timezone"><option>Asia/Kolkata</option><option>Asia/Singapore</option><option>UTC</option></select></label>
+            <label><span>Base currency</span><select [(ngModel)]="currency"><option>INR</option><option>USD</option><option>SGD</option></select></label>
+            <label><span>Date format</span><select [(ngModel)]="dateFormat"><option>DD MMM YYYY</option><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></label>
+            <div class="tenant-card"><span>Tenant identifier</span><strong>{{ tenantLabel }}</strong><small>Managed by the platform and applied to API requests.</small></div>
+          </div>
+        </article>
+
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'planning'">
+          <div class="panel-heading"><div><span>PLANNING POLICIES</span><h2>Inventory and approval rules</h2><p>Control how StockFlow proposes replenishment and routing decisions.</p></div></div>
+          <div class="settings-form two-column">
+            <label><span>Forecast horizon</span><div class="input-suffix"><input type="number" [(ngModel)]="forecastHorizon"><em>days</em></div><small>Future demand window used in planning.</small></label>
+            <label><span>Default safety stock</span><div class="input-suffix"><input type="number" [(ngModel)]="safetyStockDays"><em>days</em></div><small>Target buffer before risk escalation.</small></label>
+            <label><span>Purchase approval threshold</span><div class="input-suffix"><em>₹</em><input type="number" [(ngModel)]="approvalThreshold"></div><small>Plans above this value require approval.</small></label>
+            <label><span>Route optimization objective</span><select [(ngModel)]="routeObjective"><option>Balanced cost & carbon</option><option>Lowest logistics cost</option><option>Lowest carbon impact</option><option>Fastest service recovery</option></select><small>Primary score used for transfer route ranking.</small></label>
+          </div>
+        </article>
+
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'sustainability'">
+          <div class="panel-heading"><div><span>SUSTAINABILITY TARGETS</span><h2>Operational impact goals</h2><p>Targets used to evaluate route and inventory recommendations.</p></div></div>
+          <div class="target-grid">
+            <label><i class="target-icon green">CO₂</i><span>Logistics CO₂ reduction</span><strong>{{ co2Target }}%</strong><input type="range" min="0" max="40" [(ngModel)]="co2Target"><small>Annual reduction from route optimization.</small></label>
+            <label><i class="target-icon amber">W</i><span>Expiry waste reduction</span><strong>{{ wasteTarget }}%</strong><input type="range" min="0" max="40" [(ngModel)]="wasteTarget"><small>Reduction through FEFO and rebalancing.</small></label>
+            <label><i class="target-icon blue">V</i><span>Vehicle utilization</span><strong>{{ vehicleUtilization }}%</strong><input type="range" min="50" max="100" [(ngModel)]="vehicleUtilization"><small>Target load factor for planned transfers.</small></label>
+          </div>
+          <div class="impact-banner"><i>↗</i><div><strong>Balanced route scoring is enabled</strong><p>Recommendations consider cost, distance, service recovery and estimated carbon impact.</p></div><span>POLICY ACTIVE</span></div>
+        </article>
+
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'notifications'">
+          <div class="panel-heading"><div><span>NOTIFICATION ROUTING</span><h2>Operational alerts</h2><p>Choose which events should notify workspace administrators.</p></div></div>
+          <div class="toggle-list">
+            <label><div><strong>Inventory risk alerts</strong><small>Stockout, safety-stock and expiry signals.</small></div><input type="checkbox" [(ngModel)]="riskAlerts"><i></i></label>
+            <label><div><strong>Purchase approvals</strong><small>Plans waiting above the approval threshold.</small></div><input type="checkbox" [(ngModel)]="purchaseApprovals"><i></i></label>
+            <label><div><strong>Transfer approvals</strong><small>Route-optimized transfers requiring review.</small></div><input type="checkbox" [(ngModel)]="transferApprovals"><i></i></label>
+            <label><div><strong>Daily planning digest</strong><small>Morning summary of risks, plans and sustainability impact.</small></div><input type="checkbox" [(ngModel)]="dailyDigest"><i></i></label>
+          </div>
+        </article>
+
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'security'">
+          <div class="panel-heading"><div><span>SECURITY POLICY</span><h2>Authentication and audit controls</h2><p>Protect administrative access and retain accountability.</p></div></div>
+          <div class="toggle-list compact"><label><div><strong>Require multi-factor authentication</strong><small>Applies to all new and existing administrators.</small></div><input type="checkbox" [(ngModel)]="mfaRequired"><i></i></label></div>
+          <div class="settings-form two-column security-form">
+            <label><span>Session timeout</span><select [(ngModel)]="sessionTimeout"><option [ngValue]="30">30 minutes</option><option [ngValue]="60">60 minutes</option><option [ngValue]="120">2 hours</option></select></label>
+            <label><span>Audit retention</span><select [(ngModel)]="auditRetention"><option [ngValue]="180">180 days</option><option [ngValue]="365">365 days</option><option [ngValue]="730">2 years</option></select></label>
+          </div>
+        </article>
+
+        <article class="panel settings-card" *ngIf="activeSettingsSection === 'integrations'">
+          <div class="panel-heading"><div><span>CONNECTED SERVICES</span><h2>Integration health</h2><p>Authentication and data services used by this workspace.</p></div></div>
+          <div class="integration-list">
+            <div><i class="supabase">S</i><span><strong>Supabase Authentication</strong><small>Secure sign-in, registration and password recovery</small></span><b class="connected">Connected</b></div>
+            <div><i class="api">A</i><span><strong>StockFlow API</strong><small>Dashboard, intelligence, inventory and import services</small></span><b class="connected">Connected</b></div>
+            <div><i class="import">D</i><span><strong>Controlled Data Imports</strong><small>Audited validation and upsert workflow</small></span><b class="connected">Available</b></div>
+            <div><i class="route">R</i><span><strong>Live routing provider</strong><small>Required for real-time traffic and carrier dispatch</small></span><b class="planned">Planned</b></div>
+          </div>
+        </article>
+
+        <footer class="settings-footer"><span>Changes remain local in this product preview.</span><button type="button" class="primary-action" (click)="saveSettings()"><span>✓</span>Save changes</button></footer>
+      </div>
+    </section>
+  </ng-container>
+
+  <div class="admin-toast" *ngIf="toastMessage" role="status">{{ toastMessage }}</div>
+</section>

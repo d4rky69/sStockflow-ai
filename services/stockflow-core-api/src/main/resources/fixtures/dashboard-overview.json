@@ -1,0 +1,279 @@
+{
+  "userName": "Rohit Sharma",
+  "userRole": "Inventory Manager",
+  "asOf": "10:25 AM",
+  "kpis": [
+    {
+      "key": "inventoryValue",
+      "label": "Total Inventory Value",
+      "value": "₹24.8 Cr",
+      "change": "12.5%",
+      "comparison": "vs last month",
+      "direction": "up",
+      "intent": "positive",
+      "icon": "◇",
+      "accent": "linear-gradient(145deg,#4f2ee9,#6b4cff)"
+    },
+    {
+      "key": "stockoutRisk",
+      "label": "Stockout Risk (SKUs)",
+      "value": "128",
+      "change": "8.3%",
+      "comparison": "vs last week",
+      "direction": "down",
+      "intent": "positive",
+      "icon": "🛒",
+      "accent": "linear-gradient(145deg,#1689ff,#006be6)"
+    },
+    {
+      "key": "nearExpiry",
+      "label": "Near Expiry (₹ Value)",
+      "value": "₹3.6 Cr",
+      "change": "18.6%",
+      "comparison": "vs last month",
+      "direction": "up",
+      "intent": "negative",
+      "icon": "▣",
+      "accent": "linear-gradient(145deg,#ff9d00,#ff7a00)"
+    },
+    {
+      "key": "excess",
+      "label": "Excess Inventory",
+      "value": "₹5.2 Cr",
+      "change": "14.1%",
+      "comparison": "vs last month",
+      "direction": "down",
+      "intent": "positive",
+      "icon": "↗",
+      "accent": "linear-gradient(145deg,#18b967,#0ba750)"
+    },
+    {
+      "key": "workingCapital",
+      "label": "Working Capital Blocked",
+      "value": "₹18.7 Cr",
+      "change": "9.7%",
+      "comparison": "vs last month",
+      "direction": "up",
+      "intent": "negative",
+      "icon": "▤",
+      "accent": "linear-gradient(145deg,#17b3ce,#0698b9)"
+    }
+  ],
+  "riskTotal": 356,
+  "riskBreakdown": [
+    {
+      "label": "Near Expiry",
+      "count": 128,
+      "percentage": 36,
+      "color": "#f5534b"
+    },
+    {
+      "label": "High Stockout Risk",
+      "count": 98,
+      "percentage": 27,
+      "color": "#ff9a1f"
+    },
+    {
+      "label": "Excess / Slow Moving",
+      "count": 76,
+      "percentage": 21,
+      "color": "#2f9af5"
+    },
+    {
+      "label": "Demand Surge",
+      "count": 32,
+      "percentage": 9,
+      "color": "#1eb266"
+    },
+    {
+      "label": "Others",
+      "count": 22,
+      "percentage": 7,
+      "color": "#6849e8"
+    }
+  ],
+  "topRisks": [
+    {
+      "id": "R-001",
+      "product": "Paracetamol 650mg Tablet",
+      "batch": "B2456",
+      "warehouse": "Chennai WH",
+      "type": "Near Expiry",
+      "badgeClass": "expiry",
+      "quantity": "2,450 Units",
+      "detail": "Exp. in 45 days",
+      "metric": "Exp. in 45 days",
+      "metricIntent": "neutral",
+      "icon": "♧"
+    },
+    {
+      "id": "R-002",
+      "product": "Amoxicillin 500mg Capsule",
+      "warehouse": "Bengaluru WH",
+      "type": "Stockout Risk",
+      "badgeClass": "stockout",
+      "quantity": "1,200 Units",
+      "detail": "Stockout in 8 days",
+      "metric": "Risk Level: High",
+      "metricIntent": "high",
+      "icon": "▤"
+    },
+    {
+      "id": "R-003",
+      "product": "Cough Syrup 100ml",
+      "warehouse": "Hyderabad WH",
+      "type": "Excess Inventory",
+      "badgeClass": "excess",
+      "quantity": "3,600 Units",
+      "detail": "Slow Moving",
+      "metric": "Days of Stock: 120",
+      "metricIntent": "good",
+      "icon": "◇"
+    },
+    {
+      "id": "R-004",
+      "product": "Vitamin D3 60K Tablet",
+      "warehouse": "Delhi WH",
+      "type": "Demand Surge",
+      "badgeClass": "surge",
+      "quantity": "2,100 Units",
+      "detail": "Predicted Surge",
+      "metric": "Surge: +42%",
+      "metricIntent": "good",
+      "icon": "🛒"
+    }
+  ],
+  "demandForecast": {
+    "labels": [
+      "1 May",
+      "8 May",
+      "15 May",
+      "22 May",
+      "29 May"
+    ],
+    "actual": [
+      2300,
+      3600,
+      4100,
+      3900,
+      4700,
+      4200,
+      5600,
+      3300,
+      4100,
+      3800,
+      4900,
+      4200,
+      5300,
+      3900,
+      5900,
+      3100
+    ],
+    "forecast": [
+      3100,
+      3200,
+      3500,
+      3900,
+      4200,
+      4500,
+      4400,
+      4700,
+      4900,
+      4700,
+      5100,
+      5000,
+      5400,
+      5200,
+      4900,
+      4700
+    ],
+    "values": []
+  },
+  "inventoryTrend": {
+    "labels": [
+      "1 May",
+      "8 May",
+      "15 May",
+      "22 May",
+      "29 May"
+    ],
+    "actual": [],
+    "forecast": [],
+    "values": [
+      15.8,
+      16.4,
+      15.9,
+      17.2,
+      17.5,
+      16.8,
+      18.1,
+      17.3,
+      18.8,
+      19.1,
+      20.2,
+      19.8,
+      21.0,
+      22.4,
+      22.0,
+      23.8,
+      25.9,
+      25.1,
+      27.7,
+      27.8
+    ]
+  },
+  "recommendations": [
+    {
+      "title": "Transfer 900 units Paracetamol 650mg",
+      "subtitle": "from Chennai WH to Bengaluru WH",
+      "benefit": "₹2.45 Lakh",
+      "icon": "⇄"
+    },
+    {
+      "title": "Postpone PO #PO7823 (1,500 units)",
+      "subtitle": "Amoxicillin 500mg Capsule",
+      "benefit": "₹1.20 Lakh",
+      "icon": "▣"
+    },
+    {
+      "title": "Create Promotion for Cough Syrup 100ml",
+      "subtitle": "in South Region",
+      "benefit": "₹0.85 Lakh",
+      "icon": "⚑"
+    }
+  ],
+  "networkMetrics": [
+    {
+      "label": "Warehouses",
+      "value": "10",
+      "icon": "⌂"
+    },
+    {
+      "label": "Retailers",
+      "value": "125",
+      "icon": "▥"
+    },
+    {
+      "label": "SKUs",
+      "value": "1,250",
+      "icon": "◇"
+    },
+    {
+      "label": "Active POs",
+      "value": "98",
+      "icon": "▤"
+    }
+  ],
+  "copilotMessages": [
+    {
+      "role": "user",
+      "text": "Which products are at highest expiry risk and what action do you recommend?",
+      "timestamp": "10:30 AM"
+    },
+    {
+      "role": "assistant",
+      "text": "Here are the top expiry risks and recommended actions:\n\n1. Paracetamol 650mg (Batch B2456)\n• 2,450 units expiring in 45 days\n• Recommend: Transfer to Bengaluru (900 units) and Hyderabad (600 units)\n\n2. Azithromycin 500mg (Batch A1254)\n• 1,800 units expiring in 60 days\n• Recommend: Promote with 10% discount in South region",
+      "timestamp": "10:30 AM"
+    }
+  ]
+}

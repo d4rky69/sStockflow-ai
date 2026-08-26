@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+  title: StockFlow AI Forecast API
+  version: 0.5.2
+  description: Calibrated demand forecasting with ADI/CV-squared diagnostics, daily-versus-weekly model selection, intermittent-demand models, eligibility controls, and forecast-quality reporting.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/forecasts/runs:
+    post:
+      summary: Run calibrated demand forecasting for a tenant scope
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateForecastRunRequest'
+      responses:
+        '201': { description: Forecast run completed }
+    get:
+      summary: List recent forecast runs
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200': { description: Recent forecast runs }
+  /api/v1/forecasts/runs/{runId}:
+    get:
+      summary: Read one forecast run
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: path
+          name: runId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Forecast run }
+  /api/v1/forecasts/runs/{runId}/exceptions:
+    get:
+      summary: Read ineligible or failed forecast positions
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: path
+          name: runId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Forecast exceptions }
+  /api/v1/forecasts/latest:
+    get:
+      summary: Get persisted daily forecasts for the latest completed run
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: warehouseId
+          schema: { type: string }
+        - in: query
+          name: skuId
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 100, minimum: 1, maximum: 250 }
+      responses:
+        '200': { description: Forecast positions and daily values }
+  /api/v1/forecasts/summary:
+    get:
+      summary: Get confidence, model usage, aggregation usage, and projected-stockout summary
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Forecast summary }
+  /api/v1/forecasts/model-performance:
+    get:
+      summary: Get MAE, RMSE, MAPE, WAPE, sMAPE, MASE, RMSSE, and bias for every candidate model and aggregation
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Model performance rows }
+  /api/v1/forecasts/accuracy-summary:
+    get:
+      summary: Get aggregate forecast-quality metrics for selected models
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Accuracy summary }
+  /api/v1/forecasts/diagnostics:
+    get:
+      summary: List position-level calibration diagnostics
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: warehouseId
+          schema: { type: string }
+        - in: query
+          name: skuId
+          schema: { type: string }
+        - in: query
+          name: eligibility
+          schema: { $ref: '#/components/schemas/ForecastEligibilityStatus' }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 250, minimum: 1, maximum: 500 }
+      responses:
+        '200': { description: Position diagnostics }
+  /api/v1/forecasts/diagnostics/{warehouseId}/{skuId}:
+    get:
+      summary: Read one position diagnostic
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: path
+          name: warehouseId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: skuId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Position diagnostic }
+  /api/v1/forecasts/calibration-summary:
+    get:
+      summary: Compare selected calibrated forecasts with the best daily baseline
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Calibration summary }
+  /api/v1/forecasts/configuration:
+    get:
+      summary: Read tenant forecast configuration
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200': { description: Forecast configuration }
+    put:
+      summary: Update tenant forecast configuration
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateForecastConfigurationRequest'
+      responses:
+        '200': { description: Updated configuration }
+  /api/v1/forecasts/stockout-projections:
+    get:
+      summary: Get positions projected to deplete within the forecast horizon
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200': { description: Projected stockouts }
+components:
+  parameters:
+    TenantHeader:
+      in: header
+      name: X-Tenant-ID
+      required: true
+      schema: { type: string }
+  schemas:
+    ForecastModelCode:
+      type: string
+      enum:
+        - NAIVE
+        - MOVING_AVERAGE
+        - WEIGHTED_MOVING_AVERAGE
+        - SEASONAL_NAIVE
+        - SIMPLE_EXPONENTIAL_SMOOTHING
+        - HOLT_LINEAR_TREND
+        - HOLT_WINTERS_ADDITIVE
+        - CROSTON_CLASSIC
+        - CROSTON_SBA
+        - TSB
+    ForecastEligibilityStatus:
+      type: string
+      enum:
+        - ELIGIBLE
+        - LIMITED_HISTORY
+        - INSUFFICIENT_NON_ZERO_DEMAND
+        - DATA_GAP
+        - TOO_VOLATILE
+        - NOT_FORECASTABLE
+    CreateForecastRunRequest:
+      type: object
+      properties:
+        asOfDate: { type: string, format: date }
+        horizonDays: { type: integer, enum: [7, 30, 90], default: 30 }
+        historyDays: { type: integer, minimum: 28, maximum: 365 }
+        warehouseId: { type: string, maxLength: 64 }
+        skuId: { type: string, maxLength: 80 }
+        models:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items: { $ref: '#/components/schemas/ForecastModelCode' }
+    UpdateForecastConfigurationRequest:
+      type: object
+      properties:
+        defaultHistoryDays: { type: integer, minimum: 28, maximum: 365 }
+        backtestDays: { type: integer, minimum: 7, maximum: 90 }
+        movingAverageWindow: { type: integer, minimum: 2, maximum: 30 }
+        seasonalPeriodDays: { type: integer, minimum: 2, maximum: 30 }
+        minimumHistoryDays: { type: integer, minimum: 14, maximum: 365 }
+        minimumNonZeroObservations: { type: integer, minimum: 1, maximum: 365 }
+        smoothingAlpha: { type: number, minimum: 0.01, maximum: 0.99 }
+        trendBeta: { type: number, minimum: 0.01, maximum: 0.99 }
+        seasonalGamma: { type: number, minimum: 0.01, maximum: 0.99 }
+        highConfidenceWape: { type: number, minimum: 0 }
+        mediumConfidenceWape: { type: number, minimum: 0 }
+        highConfidenceMase: { type: number, minimum: 0 }
+        mediumConfidenceMase: { type: number, minimum: 0 }
+        maximumForecastableCvSquared: { type: number, minimum: 0.01 }
+        weeklyAggregationEnabled: { type: boolean }
+        outlierTreatmentEnabled: { type: boolean }
+        enabledModels:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 10
+          items: { $ref: '#/components/schemas/ForecastModelCode' }

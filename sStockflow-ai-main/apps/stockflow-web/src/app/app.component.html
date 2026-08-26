@@ -1,0 +1,25 @@
+<div class="auth-loading" *ngIf="auth.loading(); else resolvedAuth">
+  <span></span>
+  <p>Restoring your secure session…</p>
+</div>
+
+<ng-template #resolvedAuth>
+  <sf-login *ngIf="auth.passwordRecovery(); else normalAuth"></sf-login>
+  <ng-template #normalAuth>
+    <ng-container *ngIf="auth.session(); else login">
+      <div *ngIf="showWelcomeAnimation(); else dashboard" class="welcome-animation-container">
+        <sf-particle-text 
+          text="StockFlow AI" 
+          [particleSize]="3" 
+          [density]="5" 
+          trigger="mount" 
+          [gatherDuration]="1600"
+        ></sf-particle-text>
+      </div>
+      <ng-template #dashboard>
+        <sf-dashboard></sf-dashboard>
+      </ng-template>
+    </ng-container>
+    <ng-template #login><sf-login></sf-login></ng-template>
+  </ng-template>
+</ng-template>

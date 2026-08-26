@@ -1,0 +1,18 @@
+[project]
+name = "stockflow-copilot"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "google-genai",
+  "mcp>=1.27,<2",
+  "httpx",
+  "pydantic",
+  "pyjwt[crypto]",
+  "python-dotenv"
+]
+
+[tool.uvicorn]
+host = "127.0.0.1"
+port = 8300

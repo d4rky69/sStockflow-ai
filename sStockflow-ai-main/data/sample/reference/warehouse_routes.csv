@@ -1,0 +1,9 @@
+source_warehouse_id,destination_warehouse_id,distance_km,travel_time_hours,fixed_transfer_cost,cost_per_unit,cold_chain_supported,active
+WH-CHENNAI,WH-BENGALURU,297.3,6.9,12946.0,0.6,true,true
+WH-CHENNAI,WH-HYDERABAD,517.0,11.3,17340.0,0.6,true,true
+WH-BENGALURU,WH-CHENNAI,297.3,6.9,12946.0,0.6,true,true
+WH-BENGALURU,WH-HYDERABAD,499.8,11.0,16996.0,0.6,true,true
+WH-HYDERABAD,WH-CHENNAI,517.0,11.3,17340.0,0.6,true,true
+WH-HYDERABAD,WH-BENGALURU,499.8,11.0,16996.0,0.6,true,true
+WH-DELHI,WH-MUMBAI,1162.8,24.3,30256.0,0.6,true,true
+WH-MUMBAI,WH-DELHI,1162.8,24.3,30256.0,0.6,true,true

@@ -1,0 +1,45 @@
+{
+  "increment": "Phase 2 Increment 2 - Controlled Import",
+  "validated_at": "2026-08-02",
+  "checks": {
+    "repository_structure": {
+      "status": "PASS",
+      "files_checked": 38
+    },
+    "prepared_package_referential_integrity": {
+      "status": "PASS",
+      "tenants": 3,
+      "warehouses": 10,
+      "products": 50,
+      "skus": 100,
+      "batch_inventory": 79
+    },
+    "pom_xml_parse": {
+      "status": "PASS"
+    },
+    "yaml_parse": {
+      "status": "PASS"
+    },
+    "json_parse": {
+      "status": "PASS"
+    },
+    "python_compile": {
+      "status": "PASS"
+    },
+    "csv_parser_kotlin_compile": {
+      "status": "PASS"
+    },
+    "import_service_stubbed_type_compile": {
+      "status": "PASS"
+    },
+    "real_maven_test_suite": {
+      "status": "PENDING_DEVELOPER_WORKSTATION",
+      "command": "mvn -Dkotlin.compiler.daemon=false clean test"
+    }
+  },
+  "prepared_package_sha256": "543accb088387609936ed573c9f1c520c2bdcaffcb77df0ab3452cfb82ccb088",
+  "notes": [
+    "The container did not have the project Maven dependency cache, so the real Spring Boot test suite was not executed here.",
+    "Use the separate stockflow_phase2 database to avoid mixing the Increment 1 development seed with the controlled import dataset."
+  ]
+}

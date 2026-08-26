@@ -1,0 +1,15 @@
+{
+  "dataset_name": "stockflow-sprint1-sample",
+  "dataset_version": "1.0.0",
+  "generated_at": "2026-07-26T09:33:55.117283+00:00",
+  "random_seed": 20260726,
+  "forecast_as_of_date": "2026-07-26",
+  "counts": {
+    "tenants": 3,
+    "warehouses": 6,
+    "retailers": 12,
+    "skus": 12,
+    "sales_history": 1320,
+    "batch_inventory": 45
+  }
+}

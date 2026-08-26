@@ -1,0 +1,16 @@
+{
+  "increment": "Phase 3 Increment 5A - Forecasting Foundation",
+  "artifact_type": "backend overlay",
+  "validation": {
+    "kotlin_main_source_compile_with_dependency_stubs": "PASS",
+    "forecast_model_smoke_test": "PASS",
+    "xml_parse": "PASS",
+    "yaml_parse": "PASS",
+    "source_brace_balance": "PASS",
+    "sql_parenthesis_balance": "PASS",
+    "full_maven_test_in_artifact_environment": "NOT_RUN"
+  },
+  "full_maven_test_note": "The artifact environment did not have Maven or dependency network access. Run the supplied Maven command on the project machine before starting the API.",
+  "models": ["NAIVE", "MOVING_AVERAGE", "WEIGHTED_MOVING_AVERAGE", "SEASONAL_NAIVE"],
+  "migration": "V010__create_forecasting_foundation.sql"
+}

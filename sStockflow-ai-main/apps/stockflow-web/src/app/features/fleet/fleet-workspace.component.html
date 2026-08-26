@@ -1,0 +1,155 @@
+<section class="fleet-workspace">
+  <header class="fleet-heading">
+    <div>
+      <span class="fleet-eyebrow">FLEET OPERATIONS</span>
+      <h1>Vehicle fleet</h1>
+      <p>Fleetbase vehicles connected to {{ tenantLabel }} through the secured StockFlow backend.</p>
+    </div>
+    <div class="heading-actions">
+      <span class="connection-badge" [class.connected]="integration?.enabled && integration?.configured">
+        <i></i>{{ integration?.enabled && integration?.configured ? 'Fleetbase connected' : 'Integration unavailable' }}
+      </span>
+      <button type="button" class="refresh-button" (click)="refresh()" [disabled]="loading">
+        <span [class.spinning]="loading">&#8635;</span>{{ loading ? 'Refreshing' : 'Refresh fleet' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="read-only-banner" *ngIf="integration">
+    <span>&#128274;</span>
+    <div><strong>{{ integration.mode }} connection · {{ integration.writeOperationsEnabled ? 'Controlled writes enabled' : 'Read-only safety mode' }}</strong><small>{{ integration.writeOperationsEnabled ? 'Order creation and FEFO-gated dispatch are enabled; every transition is audited.' : 'Vehicle reads remain available while order creation and dispatch writes are disabled.' }}</small></div>
+    <code>{{ integration.apiUrl }}</code>
+  </div>
+
+  <div class="mapping-banner" *ngIf="integration?.tenantMapping as mapping" [class.warning]="!mapping.mapped || (mapping.organizationVerificationEnabled && !organization?.matchesExpectedOrganization)">
+    <span>{{ mapping.mapped ? '&#10003;' : '!' }}</span>
+    <div>
+      <strong>{{ mapping.mapped ? 'StockFlow tenant mapped' : 'Tenant is not mapped' }}</strong>
+      <small *ngIf="mapping.mapped && organization">{{ tenantLabel }} is connected to {{ organization.name || organization.id }}.</small>
+      <small *ngIf="mapping.mapped && !organization">Organization details will appear after the backend is restarted with Phase 3.</small>
+      <small *ngIf="!mapping.mapped">This tenant cannot access the configured Fleetbase organization.</small>
+    </div>
+    <b *ngIf="mapping.organizationVerificationEnabled">{{ organization?.matchesExpectedOrganization ? 'Organization verified' : 'Verification pending' }}</b>
+    <b *ngIf="!mapping.organizationVerificationEnabled">Tenant guard active</b>
+  </div>
+
+  <div class="error-banner" *ngIf="error">
+    <div><strong>Fleetbase data unavailable</strong><span>{{ error }}</span></div>
+    <button type="button" (click)="refresh()">Try again</button>
+  </div>
+
+  <section class="fleet-metrics">
+    <article><span>Total vehicles</span><strong>{{ vehicles.length }}</strong><small>Returned by Fleetbase API</small></article>
+    <article><span>Online now</span><strong class="success">{{ onlineCount }}</strong><small>Reporting an active connection</small></article>
+    <article><span>Available</span><strong>{{ availableCount }}</strong><small>Ready for assignment</small></article>
+    <article><span>Last synchronized</span><strong class="time">{{ lastUpdated ? (lastUpdated | date:'shortTime') : '—' }}</strong><small>{{ lastUpdated ? (lastUpdated | date:'mediumDate') : 'Waiting for first refresh' }}</small></article>
+  </section>
+
+  <sf-fleet-gis-map [vehicles]="vehicles"></sf-fleet-gis-map>
+
+  <section class="integration-health" *ngIf="audit as health">
+    <header><div><span>PHASE 8 · PRODUCTION READINESS</span><h2>Fleetbase integration control centre</h2><p>Live rollout gates, webhook processing and reconciliation exceptions for {{ tenantLabel }}.</p></div><b [class.ready]="health.rolloutStatus === 'READY'">{{ health.rolloutStatus.replaceAll('_', ' ') }}</b></header>
+    <div class="health-grid">
+      <article><span>Order links</span><strong>{{ health.totalLinks }}</strong><small>{{ health.created }} created · {{ health.dispatched }} dispatched</small></article>
+      <article><span>Webhook events</span><strong>{{ health.webhookEvents }}</strong><small>{{ health.lastWebhookAt ? ('Last event ' + (health.lastWebhookAt | date:'short')) : 'Waiting for first signed event' }}</small></article>
+      <article [class.issue]="health.reconciliationIssues > 0"><span>Reconciliation issues</span><strong>{{ health.reconciliationIssues }}</strong><small>{{ health.reconciliationIssues ? 'Review remote/local state' : 'No state drift detected' }}</small></article>
+      <article [class.issue]="health.failed > 0"><span>Failed operations</span><strong>{{ health.failed }}</strong><small>{{ health.failed ? 'Retry from transfer workflow' : 'No failed links' }}</small></article>
+    </div>
+    <footer><span [class.ok]="health.writesEnabled">{{ health.writesEnabled ? '✓' : '○' }} Controlled writes</span><span [class.ok]="health.webhookConfigured">{{ health.webhookConfigured ? '✓' : '○' }} Signed webhooks</span><span class="ok">✓ Idempotent recovery</span><span class="ok">✓ Audit trail</span></footer>
+  </section>
+
+  <section class="fleet-card">
+    <header class="fleet-card-header">
+      <div><h2>Fleetbase vehicle registry</h2><p>Search and inspect the assets available to StockFlow routing.</p></div>
+      <div class="filters">
+        <label class="search-control"><span>&#128269;</span><input [(ngModel)]="search" placeholder="Search vehicle, plate or ID" /></label>
+        <select [(ngModel)]="filter" aria-label="Filter vehicles">
+          <option value="all">All vehicles</option>
+          <option value="online">Online</option>
+          <option value="offline">Offline</option>
+          <option value="available">Available</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="loading-state" *ngIf="loading && !vehicles.length"><i></i><span>Loading Fleetbase vehicles…</span></div>
+
+    <div class="vehicle-table" *ngIf="!loading || vehicles.length">
+      <div class="vehicle-row table-head"><span>Vehicle</span><span>Plate / ID</span><span>Specification</span><span>Payload</span><span>Status</span><span></span></div>
+      <button type="button" class="vehicle-row" *ngFor="let vehicle of filteredVehicles" (click)="selectVehicle(vehicle)">
+        <span class="vehicle-name"><i>&#128666;</i><span><strong>{{ vehicleTitle(vehicle) }}</strong><small>{{ vehicle.type || 'Fleet vehicle' }}</small></span></span>
+        <span><strong>{{ vehicle.plateNumber || 'No plate' }}</strong><small>{{ vehicle.internalId || vehicle.id }}</small></span>
+        <span><strong>{{ vehicleSpecification(vehicle) }}</strong><small>Fleetbase asset</small></span>
+        <span><strong>{{ vehicle.payloadCapacity ? (vehicle.payloadCapacity | number) + ' kg' : 'Not set' }}</strong><small>Configured capacity</small></span>
+        <span><b class="status-pill" [class.online]="vehicle.online" [class.available]="vehicle.status === 'available'"><i></i>{{ vehicle.online ? 'Online' : (vehicle.status || 'Offline') }}</b></span>
+        <span class="open-detail">View &#8250;</span>
+      </button>
+      <div class="empty-state" *ngIf="!filteredVehicles.length && !loading"><span>&#128666;</span><strong>No matching vehicles</strong><p>Clear the search or select a different status filter.</p></div>
+    </div>
+
+    <footer class="fleet-footer"><span>Source: <strong>FLEETBASE_API</strong></span><span>{{ filteredVehicles.length }} of {{ vehicles.length }} vehicles shown</span></footer>
+  </section>
+
+  <div class="detail-backdrop" *ngIf="selectedVehicle" (click)="closeDetails()"></div>
+  <aside class="vehicle-details" *ngIf="selectedVehicle as vehicle" aria-label="Vehicle details">
+    <header><div><span>FLEETBASE VEHICLE</span><h2>{{ vehicleTitle(vehicle) }}</h2></div><button type="button" (click)="closeDetails()" aria-label="Close details">&times;</button></header>
+    <div class="vehicle-hero"><i>&#128666;</i><div><b class="status-pill" [class.online]="vehicle.online"><em></em>{{ vehicle.online ? 'Online' : 'Offline' }}</b><p>{{ vehicleSpecification(vehicle) }}</p></div></div>
+    <dl>
+      <div><dt>Fleetbase ID</dt><dd>{{ vehicle.id }}</dd></div>
+      <div><dt>Internal ID</dt><dd>{{ vehicle.internalId || 'Not provided' }}</dd></div>
+      <div><dt>Plate number</dt><dd>{{ vehicle.plateNumber || 'Not provided' }}</dd></div>
+      <div><dt>Operational status</dt><dd>{{ vehicle.status || 'Not provided' }}</dd></div>
+      <div><dt>Vehicle type</dt><dd>{{ vehicle.type || 'Not provided' }}</dd></div>
+      <div><dt>Payload capacity</dt><dd>{{ vehicle.payloadCapacity ? (vehicle.payloadCapacity | number) + ' kg' : 'Not configured' }}</dd></div>
+    </dl>
+    <section class="vehicle-live-card">
+      <header>
+        <div><span>LIVE VEHICLE TELEMETRY</span><h3>Tracking & route status</h3></div>
+        <b [class.live]="hasVehiclePosition(vehicle)"><i></i>{{ hasVehiclePosition(vehicle) ? 'GPS connected' : 'Prototype ready' }}</b>
+      </header>
+      <div class="telemetry-grid">
+        <article><span>Route ETA</span><strong>{{ prototypeEta(vehicle) }}</strong><small>Shillong relief hub</small></article>
+        <article><span>Remaining</span><strong>{{ prototypeDistance(vehicle) }}</strong><small>Guwahati → Shillong</small></article>
+        <article><span>Speed</span><strong>{{ vehicle.speed !== null && vehicle.speed !== undefined ? (vehicle.speed | number:'1.0-0') + ' km/h' : '46 km/h' }}</strong><small>{{ hasVehiclePosition(vehicle) ? 'Fleetbase telemetry' : 'Prototype speed' }}</small></article>
+        <article><span>Heading</span><strong>{{ vehicleHeading(vehicle) }}</strong><small>Vehicle bearing</small></article>
+      </div>
+      <div class="route-progress-label"><span>Corridor progress</span><strong>{{ prototypeProgress(vehicle) }}%</strong></div>
+      <div class="route-progress"><i [style.width.%]="prototypeProgress(vehicle)"></i></div>
+      <dl class="tracking-details">
+        <div><dt>GPS position</dt><dd>{{ vehicleCoordinates(vehicle) }}</dd></div>
+        <div><dt>Next checkpoint</dt><dd>Nongpoh accessibility post</dd></div>
+        <div><dt>Last GPS update</dt><dd>{{ vehicle.positionUpdatedAt ? (vehicle.positionUpdatedAt | date:'medium') : 'No Fleetbase position received' }}</dd></div>
+      </dl>
+      <button type="button" class="track-on-map" (click)="showVehicleTracking(vehicle)">
+        <span>&#10148;</span>
+        <span><strong>Show live tracking on map</strong><small>{{ hasVehiclePosition(vehicle) ? 'Focus the current Fleetbase GPS position' : 'Start the accelerated prototype route' }}</small></span>
+        <b>&#8250;</b>
+      </button>
+      <p class="prototype-disclosure" *ngIf="!hasVehiclePosition(vehicle)">This vehicle has not reported a valid GPS position. The button starts clearly labelled prototype coordinates for the SIH demonstration.</p>
+    </section>
+    <section class="weather-risk-card">
+      <header>
+        <div><span>WEATHER-AWARE ROUTE INTELLIGENCE</span><h3>Arrival forecast & disruption risk</h3></div>
+        <b *ngIf="weatherForecast as forecast" [class.moderate]="forecast.riskLevel === 'MODERATE'" [class.high]="forecast.riskLevel === 'HIGH'">{{ forecast.riskLevel }} RISK</b>
+      </header>
+      <div class="weather-loading" *ngIf="weatherLoading"><i></i><span>Matching Google hourly weather to route ETA…</span></div>
+      <div class="weather-error" *ngIf="weatherError && !weatherLoading"><strong>Forecast unavailable</strong><span>{{ weatherError }}</span><button type="button" (click)="loadWeatherForecast(vehicle)">Retry</button></div>
+      <ng-container *ngIf="weatherForecast as forecast">
+        <div class="weather-summary">
+          <img *ngIf="forecast.iconUrl" [src]="forecast.iconUrl" alt="" />
+          <div><strong>{{ forecast.temperatureCelsius | number:'1.0-0' }}°C</strong><span>{{ forecast.condition }}</span><small>{{ forecast.locationLabel }} · ETA {{ prototypeEta(vehicle) }}</small></div>
+          <div class="risk-score"><strong>{{ forecast.riskScore }}</strong><span>/100</span><small>route risk</small></div>
+        </div>
+        <div class="weather-grid">
+          <article><span>Rain chance</span><strong>{{ forecast.precipitationProbabilityPercent }}%</strong><small>{{ forecast.precipitationMillimeters | number:'1.1-1' }} mm expected</small></article>
+          <article><span>Thunderstorm</span><strong>{{ forecast.thunderstormProbabilityPercent }}%</strong><small>At predicted arrival</small></article>
+          <article><span>Wind / gust</span><strong>{{ forecast.windSpeedKph | number:'1.0-0' }} / {{ forecast.windGustKph | number:'1.0-0' }}</strong><small>km/h</small></article>
+          <article><span>Visibility</span><strong>{{ forecast.visibilityKm | number:'1.1-1' }} km</strong><small>{{ forecast.humidityPercent }}% humidity</small></article>
+        </div>
+        <div class="weather-advice"><strong>Operational assessment</strong><p>{{ forecast.operationalAdvice }}</p></div>
+        <footer><span>{{ forecast.forecastTime ? ('Forecast hour ' + (forecast.forecastTime | date:'short')) : 'Hourly forecast' }}</span><small>{{ forecast.attribution }}</small></footer>
+      </ng-container>
+    </section>
+    <div class="next-phase"><strong>Live operations connected</strong><p>Vehicle registry, transfer order creation, FEFO-gated dispatch, tracker/ETA synchronization, signed webhooks and reconciliation are now implemented.</p></div>
+  </aside>
+</section>

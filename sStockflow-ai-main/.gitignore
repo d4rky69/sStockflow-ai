@@ -1,0 +1,55 @@
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Java / Maven
+target/
+*.iml
+.idea/
+
+# Generated data
+data/generated/*
+!data/generated/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets and sensitive files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.cer
+*.crt
+*.p12
+*.pfx
+secrets.json
+credentials.json
+supabase*.json
+auth.json
+*.log
+npm-debug.log*
+*.egg-info/
+*.db
+tools/reports/
+
+# Specific app folders
+apps/stockflow-web/node_modules/
+apps/stockflow-web/dist/
+apps/stockflow-web/.angular/
+apps/stockflow-web-backup-before-frontend-increment1/
+apps/stockflow-web-backup-before-frontend-increment2/
+services/stockflow-core-api/target/
+
+# Local Environment Binaries (JDK, Postgres, etc.)
+local-env/

@@ -1,0 +1,2 @@
+purchase_order_id,tenant_id,supplier_id,warehouse_id,sku_id,order_date,expected_delivery_date,ordered_quantity,received_quantity,open_quantity,unit_purchase_price,currency,status,buyer_id
+PO-2026-007823,TEN-ACME-PHARMA,SUP-001,WH-BENGALURU,SKU-PARA-650,2026-07-24,2026-08-05,1500,0,1500,18.25,INR,OPEN,USR-BUYER-01

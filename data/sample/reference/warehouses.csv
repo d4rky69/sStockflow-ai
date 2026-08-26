@@ -1,0 +1,7 @@
+warehouse_id,tenant_id,warehouse_name,city,state,latitude,longitude,capacity_units,cold_chain_available,active
+WH-CHENNAI,TEN-ACME-PHARMA,Chennai Regional Warehouse,Chennai,Tamil Nadu,13.0827,80.2707,280000,true,true
+WH-BENGALURU,TEN-ACME-PHARMA,Bengaluru Regional Warehouse,Bengaluru,Karnataka,12.9716,77.5946,380000,true,true
+WH-HYDERABAD,TEN-ACME-PHARMA,Hyderabad Regional Warehouse,Hyderabad,Telangana,17.385,78.4867,470000,true,true
+WH-DELHI,TEN-FRESH-MART,Delhi Regional Warehouse,Delhi,Delhi,28.6139,77.209,360000,false,true
+WH-MUMBAI,TEN-FRESH-MART,Mumbai Regional Warehouse,Mumbai,Maharashtra,19.076,72.8777,450000,false,true
+WH-PUNE,TEN-URBAN-TRADE,Pune Regional Warehouse,Pune,Maharashtra,18.5204,73.8567,320000,false,true

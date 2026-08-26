@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: StockFlow District API
+  version: 1.0.0
+  description: API for retrieving district registry and boundary map features.
+paths:
+  /api/v1/districts:
+    get:
+      summary: Get all districts for a tenant
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema:
+            type: string
+          description: The tenant ID for data isolation.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DistrictRegistry'
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    DistrictRegistry:
+      type: object
+      required:
+        - districtId
+        - tenantId
+        - name
+        - status
+        - source
+        - extractedAt
+        - validUntil
+        - confidenceScore
+        - geometryJson
+      properties:
+        districtId:
+          type: string
+        tenantId:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [FORECAST_AVAILABLE, NO_DATA, BASELINE_ONLY]
+        source:
+          type: string
+        extractedAt:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+        confidenceScore:
+          type: number
+          format: double
+        geometryJson:
+          type: string

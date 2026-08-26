@@ -1,0 +1,13 @@
+{
+  "valid": true,
+  "error_count": 0,
+  "errors": [],
+  "row_counts": {
+    "sales": 1320,
+    "batches": 45,
+    "purchase_orders": 1
+  },
+  "tenant_count": 3,
+  "warehouse_count": 6,
+  "sku_count": 12
+}

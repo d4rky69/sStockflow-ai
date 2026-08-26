@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: StockFlow AI Forecast API
+  version: 0.5.0
+  description: Statistical demand forecasting and model-performance endpoints.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/forecasts/runs:
+    post:
+      summary: Run demand forecasting for a tenant scope
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateForecastRunRequest'
+      responses:
+        '201':
+          description: Forecast run completed
+    get:
+      summary: List recent forecast runs
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200':
+          description: Recent runs
+  /api/v1/forecasts/latest:
+    get:
+      summary: Get persisted daily forecasts for the latest completed run
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+        - in: query
+          name: runId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: warehouseId
+          schema: { type: string }
+        - in: query
+          name: skuId
+          schema: { type: string }
+      responses:
+        '200':
+          description: Forecast positions and daily values
+  /api/v1/forecasts/summary:
+    get:
+      summary: Get forecast confidence, model usage and projected-stockout summary
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200':
+          description: Forecast summary
+  /api/v1/forecasts/model-performance:
+    get:
+      summary: Get backtesting metrics for every candidate model
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200':
+          description: Model performance rows
+  /api/v1/forecasts/stockout-projections:
+    get:
+      summary: Get forecast positions whose inventory is projected to deplete within the horizon
+      parameters:
+        - $ref: '#/components/parameters/TenantHeader'
+      responses:
+        '200':
+          description: Projected stockouts
+components:
+  parameters:
+    TenantHeader:
+      in: header
+      name: X-Tenant-ID
+      required: true
+      schema: { type: string }
+  schemas:
+    CreateForecastRunRequest:
+      type: object
+      properties:
+        asOfDate: { type: string, format: date }
+        horizonDays: { type: integer, enum: [7, 30, 90], default: 30 }
+        historyDays: { type: integer, minimum: 28, maximum: 365 }
+        warehouseId: { type: string }
+        skuId: { type: string }
+        models:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            enum: [NAIVE, MOVING_AVERAGE, WEIGHTED_MOVING_AVERAGE, SEASONAL_NAIVE]

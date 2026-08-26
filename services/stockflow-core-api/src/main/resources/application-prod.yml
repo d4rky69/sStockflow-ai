@@ -1,0 +1,17 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SUPABASE_JWT_ISSUER}
+  datasource:
+    url: ${STOCKFLOW_DB_URL}
+    username: ${STOCKFLOW_DB_USERNAME}
+    password: ${STOCKFLOW_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${STOCKFLOW_DB_POOL_SIZE:20}
+      minimum-idle: ${STOCKFLOW_DB_MIN_IDLE:2}
+      connection-timeout: 5000
+      validation-timeout: 3000
+  flyway:
+    locations: classpath:db/migration

@@ -1,0 +1,115 @@
+SKU,brand_name,generic_name,salt,strength,form,pack_size
+MED0001,Crocin,Paracetamol,Paracetamol,500mg,Tablet,15 tabs
+MED0002,Dolo 650,Paracetamol,Paracetamol,650mg,Tablet,15 tabs
+MED0003,Calpol,Paracetamol Syrup,Paracetamol,125mg/5ml,Syrup,60ml
+MED0004,Combiflam,Ibuprofen+Paracetamol,Ibuprofen+Paracetamol,400mg+325mg,Tablet,20 tabs
+MED0005,Brufen,Ibuprofen,Ibuprofen,400mg,Tablet,15 tabs
+MED0006,Voveran,Diclofenac,Diclofenac Sodium,50mg,Tablet,10 tabs
+MED0007,Voveran SR,Diclofenac SR,Diclofenac Sodium,100mg,Tablet,10 tabs
+MED0008,Zerodol,Aceclofenac,Aceclofenac,100mg,Tablet,10 tabs
+MED0009,Zerodol-P,Aceclofenac+Paracetamol,Aceclofenac+Paracetamol,100mg+325mg,Tablet,10 tabs
+MED0010,Nise,Nimesulide,Nimesulide,100mg,Tablet,10 tabs
+MED0011,Saridon,Analgesic combo,Paracetamol+Propyphenazone+Caffeine,250mg+150mg+50mg,Tablet,10 tabs
+MED0012,Meftal Spas,Mefenamic+Dicyclomine,Mefenamic Acid+Dicyclomine,250mg+10mg,Tablet,15 tabs
+MED0013,Tramazac,Tramadol,Tramadol HCl,50mg,Capsule,10 caps
+MED0014,Augmentin 625,Amoxicillin+Clavulanate,Amoxicillin+Clavulanic Acid,500mg+125mg,Tablet,10 tabs
+MED0015,Azithral 500,Azithromycin,Azithromycin,500mg,Tablet,5 tabs
+MED0016,Ciplox 500,Ciprofloxacin,Ciprofloxacin,500mg,Tablet,10 tabs
+MED0017,Taxim-O,Cefixime,Cefixime,200mg,Tablet,10 tabs
+MED0018,Monocef,Ceftriaxone,Ceftriaxone,1g,Injection,1 vial
+MED0019,Amoxil,Amoxicillin,Amoxicillin,500mg,Capsule,10 caps
+MED0020,Doxy 100,Doxycycline,Doxycycline,100mg,Capsule,10 caps
+MED0021,Norflox,Norfloxacin,Norfloxacin,400mg,Tablet,10 tabs
+MED0022,Levoflox,Levofloxacin,Levofloxacin,500mg,Tablet,5 tabs
+MED0023,Metrogyl,Metronidazole,Metronidazole,400mg,Tablet,15 tabs
+MED0024,Clavam 625,Amoxicillin+Clavulanate,Amoxicillin+Clavulanic Acid,500mg+125mg,Tablet,10 tabs
+MED0025,Zifi 200,Cefixime,Cefixime,200mg,Tablet,10 tabs
+MED0026,Cefspan,Cefixime,Cefixime,100mg,Capsule,10 caps
+MED0027,Glycomet 500,Metformin,Metformin HCl,500mg,Tablet,20 tabs
+MED0028,Glycomet-GP1,Metformin+Glimepiride,Metformin+Glimepiride,500mg+1mg,Tablet,15 tabs
+MED0029,Januvia,Sitagliptin,Sitagliptin,100mg,Tablet,10 tabs
+MED0030,Galvus Met,Vildagliptin+Metformin,Vildagliptin+Metformin,50mg+500mg,Tablet,15 tabs
+MED0031,Amaryl,Glimepiride,Glimepiride,2mg,Tablet,15 tabs
+MED0032,Lantus,Insulin Glargine,Insulin Glargine,100IU/ml,Injection,3ml pen
+MED0033,Human Mixtard,Insulin,Human Insulin,40IU/ml,Injection,10ml vial
+MED0034,Jardiance,Empagliflozin,Empagliflozin,10mg,Tablet,10 tabs
+MED0035,Ecosprin 75,Aspirin,Aspirin,75mg,Tablet,14 tabs
+MED0036,Ecosprin AV,Aspirin+Atorvastatin,Aspirin+Atorvastatin,75mg+10mg,Capsule,10 caps
+MED0037,Amlopres 5,Amlodipine,Amlodipine Besylate,5mg,Tablet,10 tabs
+MED0038,Telma 40,Telmisartan,Telmisartan,40mg,Tablet,10 tabs
+MED0039,Telma-H,Telmisartan+HCTZ,Telmisartan+Hydrochlorothiazide,40mg+12.5mg,Tablet,10 tabs
+MED0040,Losar 50,Losartan,Losartan Potassium,50mg,Tablet,10 tabs
+MED0041,Concor 5,Bisoprolol,Bisoprolol Fumarate,5mg,Tablet,10 tabs
+MED0042,Metolar XL 25,Metoprolol,Metoprolol Succinate,25mg,Tablet,10 tabs
+MED0043,Atorva 10,Atorvastatin,Atorvastatin,10mg,Tablet,10 tabs
+MED0044,Rosuvas 10,Rosuvastatin,Rosuvastatin,10mg,Tablet,10 tabs
+MED0045,Clopilet 75,Clopidogrel,Clopidogrel,75mg,Tablet,14 tabs
+MED0046,Cardace 5,Ramipril,Ramipril,5mg,Tablet,10 tabs
+MED0047,Lasix,Furosemide,Furosemide,40mg,Tablet,10 tabs
+MED0048,Pantop 40,Pantoprazole,Pantoprazole,40mg,Tablet,10 tabs
+MED0049,Omez,Omeprazole,Omeprazole,20mg,Capsule,10 caps
+MED0050,Rantac 150,Ranitidine,Ranitidine,150mg,Tablet,10 tabs
+MED0051,Digene,Antacid,Magaldrate+Simethicone,Chewable,Tablet,15 tabs
+MED0052,Gelusil,Antacid Gel,Aluminium Hydroxide+Magnesium,200mg+200mg,Syrup,170ml
+MED0053,Cyclopam,Dicyclomine+Paracetamol,Dicyclomine+Paracetamol,20mg+500mg,Tablet,15 tabs
+MED0054,Eldoper,Loperamide,Loperamide HCl,2mg,Capsule,6 caps
+MED0055,Sporlac,Probiotic,Lactic Acid Bacillus,120mg,Capsule,20 caps
+MED0056,Dulcoflex,Bisacodyl,Bisacodyl,5mg,Tablet,10 tabs
+MED0057,Rablet 20,Rabeprazole,Rabeprazole,20mg,Tablet,10 tabs
+MED0058,Allegra 120,Fexofenadine,Fexofenadine HCl,120mg,Tablet,10 tabs
+MED0059,Cetzine,Cetirizine,Cetirizine HCl,10mg,Tablet,10 tabs
+MED0060,Avil 25,Pheniramine,Pheniramine Maleate,25mg,Tablet,10 tabs
+MED0061,Benadryl,Cough Syrup,Diphenhydramine,12.5mg/5ml,Syrup,100ml
+MED0062,Ascoril LS,Cough Syrup,Ambroxol+Levosalbutamol+Guaifenesin,Combo,Syrup,100ml
+MED0063,Grilinctus,Cough Syrup,Dextromethorphan+Chlorpheniramine,Combo,Syrup,100ml
+MED0064,Asthalin,Salbutamol Inhaler,Salbutamol,100mcg/dose,Inhaler,200 doses
+MED0065,Foracort,Budesonide+Formoterol,Budesonide+Formoterol,200mcg+6mcg,Inhaler,120 doses
+MED0066,Montair 10,Montelukast,Montelukast Sodium,10mg,Tablet,10 tabs
+MED0067,Montair-LC,Montelukast+Levocetirizine,Montelukast+Levocetirizine,10mg+5mg,Tablet,10 tabs
+MED0068,Sinarest,Cold Tablet,Paracetamol+Phenylephrine+CPM,Combo,Tablet,10 tabs
+MED0069,Otrivin,Nasal Decongestant,Xylometazoline,0.10%,Nasal Drops,10ml
+MED0070,Shelcal 500,Calcium+Vitamin D3,Calcium Carbonate+D3,500mg+250IU,Tablet,15 tabs
+MED0071,Becosules,B-Complex+Vit C,Vitamin B Complex+C,Combo,Capsule,20 caps
+MED0072,Neurobion Forte,Vitamin B Complex,B1+B6+B12,Combo,Tablet,30 tabs
+MED0073,Zincovit,Multivitamin+Zinc,Multivitamin+Minerals,Combo,Tablet,15 tabs
+MED0074,Revital H,Multivitamin,Ginseng+Multivitamin+Minerals,Combo,Capsule,30 caps
+MED0075,Limcee,Vitamin C,Ascorbic Acid,500mg,Chewable Tablet,15 tabs
+MED0076,D-Rise,Vitamin D3,Cholecalciferol,60000IU,Sachet,4 sachets
+MED0077,Folvite,Folic Acid,Folic Acid,5mg,Tablet,30 tabs
+MED0078,Evion 400,Vitamin E,Tocopheryl Acetate,400mg,Capsule,10 caps
+MED0079,A to Z,Multivitamin,Multivitamin+Multimineral,Combo,Tablet,15 tabs
+MED0080,Feronia XT,Iron+Folic Acid,Ferrous Ascorbate+Folic Acid,100mg+1.5mg,Tablet,15 tabs
+MED0081,Betnovate-N,Betamethasone+Neomycin,Betamethasone+Neomycin,0.10%,Cream,20g
+MED0082,Candid-B,Clotrimazole+Beclomethasone,Clotrimazole+Beclomethasone,1%,Cream,20g
+MED0083,Soframycin,Framycetin,Framycetin Sulphate,1%,Cream,30g
+MED0084,Quadriderm,Betamethasone+Antibiotic combo,Betamethasone+Clotrimazole+Neomycin+Tolnaftate,Combo,Cream,20g
+MED0085,Panderm Plus,Skin combo cream,Betamethasone+Clotrimazole+Neomycin,Combo,Cream,20g
+MED0086,Melacare,Skin lightening,Hydroquinone+Tretinoin+Mometasone,Combo,Cream,15g
+MED0087,Itch Guard,Antifungal,Miconazole,2%,Powder,100g
+MED0088,Meftal-Spas,Menstrual cramps,Mefenamic Acid+Dicyclomine,250mg+10mg,Tablet,10 tabs
+MED0089,Duphaston,Dydrogesterone,Dydrogesterone,10mg,Tablet,10 tabs
+MED0090,I-Pill,Emergency Contraceptive,Levonorgestrel,1.5mg,Tablet,1 tab
+MED0091,Folinine,Folic Acid Pregnancy,Folic Acid,5mg,Tablet,30 tabs
+MED0092,Susten 200,Progesterone,Micronized Progesterone,200mg,Capsule,10 caps
+MED0093,Ativan,Lorazepam,Lorazepam,1mg,Tablet,10 tabs
+MED0094,Nexito,Escitalopram,Escitalopram,10mg,Tablet,10 tabs
+MED0095,Stugeron,Cinnarizine,Cinnarizine,25mg,Tablet,20 tabs
+MED0096,Vertin 16,Betahistine,Betahistine,16mg,Tablet,15 tabs
+MED0097,Gabapin 300,Gabapentin,Gabapentin,300mg,Capsule,10 caps
+MED0098,Thyronorm 50,Levothyroxine,Levothyroxine Sodium,50mcg,Tablet,100 tabs
+MED0099,Eltroxin 100,Levothyroxine,Levothyroxine Sodium,100mcg,Tablet,100 tabs
+MED0100,Flexon,Muscle relaxant,Paracetamol+Chlorzoxazone,Combo,Tablet,10 tabs
+MED0101,Myoril 4,Thiocolchicoside,Thiocolchicoside,4mg,Capsule,10 caps
+MED0102,Volini Gel,Topical analgesic,Diclofenac Diethylamine,1.16%,Gel,30g
+MED0103,Moov,Pain relief spray,Diclofenac+Methyl Salicylate,Combo,Spray,70g
+MED0104,Dabur Chyawanprash,Immunity tonic,Herbal,Combo,Paste,500g
+MED0105,Liv 52,Liver tonic,Herbal Hepatoprotective,Combo,Tablet,60 tabs
+MED0106,Himalaya Cystone,Kidney stone support,Herbal,Combo,Tablet,60 tabs
+MED0107,Baidyanath Triphala,Digestive,Herbal,Combo,Tablet,120 tabs
+MED0108,Fluka 150,Fluconazole,Fluconazole,150mg,Capsule,1 cap
+MED0109,Acivir 400,Acyclovir,Acyclovir,400mg,Tablet,10 tabs
+MED0110,Candiforce,Itraconazole,Itraconazole,100mg,Capsule,10 caps
+MED0111,Zentel,Albendazole,Albendazole,400mg,Tablet,1 tab
+MED0112,Bandy 400,Albendazole,Albendazole,400mg,Chewable Tablet,1 tab
+MED0113,Electral,ORS Powder,Oral Rehydration Salts,Combo,Sachet,21g
+MED0114,Enerzal,ORS Powder,Oral Rehydration Salts,Combo,Sachet,22.5g

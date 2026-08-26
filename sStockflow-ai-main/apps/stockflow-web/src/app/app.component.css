@@ -1,0 +1,31 @@
+.auth-loading {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  background: #f5f7fb;
+  color: #344054;
+}
+
+.auth-loading span {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #d9def0;
+  border-top-color: #4f35e8;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+.auth-loading p { margin: 0; font-size: 14px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.welcome-animation-container {
+  width: 100vw;
+  height: 100vh;
+  background: #09090f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

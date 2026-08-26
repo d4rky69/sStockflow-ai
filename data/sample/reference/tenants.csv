@@ -1,0 +1,4 @@
+tenant_id,tenant_name,vertical,currency,timezone,active
+TEN-ACME-PHARMA,Acme Pharma Distribution,PHARMA,INR,Asia/Kolkata,true
+TEN-FRESH-MART,FreshMart Wholesale,SUPERMARKET,INR,Asia/Kolkata,true
+TEN-URBAN-TRADE,Urban Trade Distribution,MERCHANDISE,INR,Asia/Kolkata,true

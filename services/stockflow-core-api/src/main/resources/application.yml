@@ -1,0 +1,68 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: stockflow-core-api
+  profiles:
+    default: sprint1
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+        format_sql: false
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    clean-disabled: true
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,flyway
+  endpoint:
+    health:
+      show-details: always
+
+stockflow:
+  tenant-header: X-Tenant-ID
+  security:
+    enabled: ${STOCKFLOW_SECURITY_ENABLED:false}
+    bootstrap-first-user-admin: ${STOCKFLOW_BOOTSTRAP_FIRST_USER_ADMIN:false}
+  intelligence:
+    stockout-cover-days: 14
+    excess-cover-days: 90
+    near-expiry-days: 60
+    demand-surge-percent: 50
+  fleetbase:
+    enabled: ${FLEETBASE_ENABLED:false}
+    api-url: ${FLEETBASE_API_URL:https://api.fleetbase.io/v1}
+    api-key: ${FLEETBASE_API_KEY:}
+    tenant-id: ${FLEETBASE_TENANT_ID:TEN-ACME-PHARMA}
+    organization-id: ${FLEETBASE_ORGANIZATION_ID:}
+    write-operations-enabled: ${FLEETBASE_WRITE_OPERATIONS_ENABLED:false}
+    webhook-secret: ${FLEETBASE_WEBHOOK_SECRET:}
+    connect-timeout-seconds: ${FLEETBASE_CONNECT_TIMEOUT_SECONDS:5}
+    read-timeout-seconds: ${FLEETBASE_READ_TIMEOUT_SECONDS:15}
+  google-maps:
+    api-key: ${GOOGLE_MAPS_BACKEND_API_KEY:}
+    routes-api-url: ${GOOGLE_MAPS_ROUTES_API_URL:https://routes.googleapis.com/directions/v2:computeRoutes}
+    connect-timeout-seconds: ${GOOGLE_MAPS_CONNECT_TIMEOUT_SECONDS:5}
+    read-timeout-seconds: ${GOOGLE_MAPS_READ_TIMEOUT_SECONDS:15}
+  google-weather:
+    api-key: ${GOOGLE_WEATHER_API_KEY:${GOOGLE_MAPS_BACKEND_API_KEY:}}
+    api-url: ${GOOGLE_WEATHER_API_URL:https://weather.googleapis.com}
+    connect-timeout-seconds: ${GOOGLE_WEATHER_CONNECT_TIMEOUT_SECONDS:5}
+    read-timeout-seconds: ${GOOGLE_WEATHER_READ_TIMEOUT_SECONDS:15}

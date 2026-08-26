@@ -1,0 +1,74 @@
+{
+  "package": "StockFlow_AI_Phase3_Increment5B1_Forecast_Calibration_Diagnostics",
+  "base_required": "Phase 3 Increment 5B",
+  "files": [
+    {
+      "path": "INSTALL.md",
+      "bytes": 2681
+    },
+    {
+      "path": "VALIDATION_RESULTS_PHASE3_INCREMENT5B1.json",
+      "bytes": 1000
+    },
+    {
+      "path": "run-core-api-phase3-forecast-calibration-windows.cmd",
+      "bytes": 1295
+    },
+    {
+      "path": "verify-forecast-calibration-api-windows.cmd",
+      "bytes": 2222
+    },
+    {
+      "path": "contracts/forecast-api.openapi.yaml",
+      "bytes": 8432
+    },
+    {
+      "path": "docs/PHASE3_INCREMENT5B1_FORECAST_CALIBRATION_DIAGNOSTICS.md",
+      "bytes": 4008
+    },
+    {
+      "path": "scripts/postgres/verify_phase3_forecast_calibration.sql",
+      "bytes": 1083
+    },
+    {
+      "path": "services/stockflow-core-api/pom.xml",
+      "bytes": 3950
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/api/ForecastController.kt",
+      "bytes": 5924
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/application/ForecastDtos.kt",
+      "bytes": 9484
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/application/ForecastingService.kt",
+      "bytes": 60782
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/domain/ForecastingModels.kt",
+      "bytes": 15816
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/persistence/ForecastEntities.kt",
+      "bytes": 15336
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/kotlin/com/stockflow/forecasting/persistence/ForecastRepositories.kt",
+      "bytes": 1485
+    },
+    {
+      "path": "services/stockflow-core-api/src/main/resources/db/migration/V012__add_forecast_calibration_and_diagnostics.sql",
+      "bytes": 5361
+    },
+    {
+      "path": "services/stockflow-core-api/src/test/kotlin/com/stockflow/forecasting/api/ForecastControllerTest.kt",
+      "bytes": 10083
+    },
+    {
+      "path": "services/stockflow-core-api/src/test/kotlin/com/stockflow/forecasting/domain/ForecastingModelsTest.kt",
+      "bytes": 3937
+    }
+  ]
+}

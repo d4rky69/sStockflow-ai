@@ -1,0 +1,21 @@
+<section class="provider-shell">
+  <div class="provider-bar">
+    <div><span>MAP PROVIDER</span><strong>{{ provider === 'google' ? 'Google Maps Platform' : 'OpenStreetMap fallback' }}</strong><small>{{ provider === 'google' ? 'Restricted browser key · Google operational basemap' : 'No-key resilient basemap' }}</small></div>
+    <div class="provider-actions">
+      <button type="button" [class.active]="provider === 'google'" (click)="chooseProvider('google')">Google Maps</button>
+      <button type="button" [class.active]="provider === 'osm'" (click)="chooseProvider('osm')">OpenStreetMap</button>
+      <button type="button" class="settings" (click)="setupOpen = !setupOpen">{{ googleKey ? 'Change key' : 'Configure key' }}</button>
+    </div>
+  </div>
+
+  <form class="key-setup" *ngIf="setupOpen" (ngSubmit)="saveGoogleKey()">
+    <div><strong>Configure Google Maps locally</strong><span>The restricted browser key remains in this browser and is never written to Git or the backend.</span></div>
+    <input name="googleBrowserKey" type="password" [(ngModel)]="setupKey" autocomplete="off" placeholder="Paste restricted browser key (AIza…)" />
+    <button type="submit">Save & use Google</button>
+    <button type="button" class="remove" *ngIf="googleKey" (click)="forgetGoogleKey()">Remove saved key</button>
+    <span class="setup-error" *ngIf="setupError">{{ setupError }}</span>
+  </form>
+
+  <sf-google-fleet-gis-map *ngIf="provider === 'google'" [vehicles]="vehicles" [apiKey]="googleKey"></sf-google-fleet-gis-map>
+  <sf-leaflet-fleet-gis-map *ngIf="provider === 'osm'" [vehicles]="vehicles"></sf-leaflet-fleet-gis-map>
+</section>

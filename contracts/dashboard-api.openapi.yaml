@@ -1,0 +1,317 @@
+openapi: 3.1.0
+info:
+  title: StockFlow AI Core API
+  version: 0.4.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/dashboard/overview:
+    get:
+      operationId: getDashboardOverview
+      summary: Returns the live tenant-scoped inventory dashboard overview
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Dashboard overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardOverview'
+  /api/v1/analytics/demand/summary:
+    get:
+      operationId: getDemandSummary
+      summary: Returns tenant-scoped demand metrics for a configurable day window
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: windowDays
+          schema: { type: integer, minimum: 1, maximum: 365, default: 30 }
+      responses:
+        '200':
+          description: Demand summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemandSummary' }
+  /api/v1/analytics/demand/skus:
+    get:
+      operationId: getDemandSkus
+      summary: Returns warehouse and SKU demand metrics
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: windowDays
+          schema: { type: integer, minimum: 1, maximum: 365, default: 30 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 250, default: 25 }
+      responses:
+        '200':
+          description: Demand positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DemandSku' }
+  /api/v1/risks/summary:
+    get:
+      operationId: getInventoryRiskSummary
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Inventory risk summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InventoryRiskSummary' }
+  /api/v1/risks/inventory:
+    get:
+      operationId: getInventoryRisks
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string }
+        - in: query
+          name: severity
+          schema: { type: string, enum: [CRITICAL, HIGH, MEDIUM] }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 100 }
+      responses:
+        '200':
+          description: Deterministic inventory risks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/InventoryRisk' }
+  /api/v1/risks/stockout:
+    get:
+      operationId: getStockoutRisks
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 100 }
+      responses:
+        '200':
+          description: Stockout and safety-stock risks
+  /api/v1/risks/expiry:
+    get:
+      operationId: getExpiryRisks
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: days
+          schema: { type: integer, default: 60 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 100 }
+      responses:
+        '200':
+          description: Near-expiry and expired batch risks
+  /api/v1/imports/synthetic-foundation:
+    post:
+      operationId: importSyntheticFoundation
+      summary: Validates or imports a tenant-scoped synthetic foundation ZIP
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: query
+          name: mode
+          schema: { type: string, enum: [VALIDATE_ONLY, UPSERT], default: VALIDATE_ONLY }
+        - in: query
+          name: strict
+          schema: { type: boolean, default: true }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: Import job result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+  /api/v1/imports/{importJobId}:
+    get:
+      operationId: getImportJob
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: path
+          name: importJobId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Import job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+  /api/v1/imports/{importJobId}/errors:
+    get:
+      operationId: getImportErrors
+      parameters:
+        - in: header
+          name: X-Tenant-ID
+          required: true
+          schema: { type: string }
+        - in: path
+          name: importJobId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Row-level errors
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ImportError' }
+components:
+  schemas:
+    DashboardOverview:
+      type: object
+      required: [userName, userRole, asOf, kpis, riskTotal, riskBreakdown, topRisks, demandForecast, inventoryTrend, recommendations, networkMetrics, copilotMessages]
+      properties:
+        userName: { type: string }
+        userRole: { type: string }
+        asOf: { type: string }
+        kpis: { type: array, items: { type: object, additionalProperties: true } }
+        riskTotal: { type: integer }
+        riskBreakdown: { type: array, items: { type: object, additionalProperties: true } }
+        topRisks: { type: array, items: { type: object, additionalProperties: true } }
+        demandForecast: { type: object, additionalProperties: true }
+        inventoryTrend: { type: object, additionalProperties: true }
+        recommendations: { type: array, items: { type: object, additionalProperties: true } }
+        networkMetrics: { type: array, items: { type: object, additionalProperties: true } }
+        copilotMessages: { type: array, items: { type: object, additionalProperties: true } }
+
+    DemandSummary:
+      type: object
+      properties:
+        tenantId: { type: string }
+        asOfDate: { type: string, format: date }
+        windowDays: { type: integer }
+        transactionRows: { type: integer, format: int64 }
+        skuCount: { type: integer, format: int64 }
+        warehouseCount: { type: integer, format: int64 }
+        salesQuantity: { type: integer, format: int64 }
+        returnQuantity: { type: integer, format: int64 }
+        lostSalesQuantity: { type: integer, format: int64 }
+        stockoutRows: { type: integer, format: int64 }
+        averageDailyDemand: { type: number }
+        grossSalesValue: { type: number }
+        fulfilmentRatePercent: { type: number }
+    DemandSku:
+      type: object
+      properties:
+        warehouseId: { type: string }
+        warehouseName: { type: string }
+        skuId: { type: string }
+        skuName: { type: string }
+        salesQuantity: { type: integer, format: int64 }
+        averageDailyDemand: { type: number }
+        grossSalesValue: { type: number }
+    InventoryRiskSummary:
+      type: object
+      properties:
+        tenantId: { type: string }
+        asOfDate: { type: string, format: date }
+        totalRisks: { type: integer }
+        criticalCount: { type: integer }
+        highCount: { type: integer }
+        mediumCount: { type: integer }
+        stockoutRiskCount: { type: integer }
+        safetyStockBreachCount: { type: integer }
+        inventoryDataGapCount: { type: integer }
+        nearExpiryCount: { type: integer }
+        expiredCount: { type: integer }
+        excessInventoryCount: { type: integer }
+        slowMovingCount: { type: integer }
+        demandSurgeCount: { type: integer }
+        riskExposureValue: { type: number }
+    InventoryRisk:
+      type: object
+      properties:
+        riskId: { type: string }
+        tenantId: { type: string }
+        riskType: { type: string }
+        severity: { type: string, enum: [CRITICAL, HIGH, MEDIUM] }
+        asOfDate: { type: string, format: date }
+        warehouseId: { type: string }
+        warehouseName: { type: string }
+        skuId: { type: string }
+        skuName: { type: string }
+        batchNumber: { type: [string, 'null'] }
+        usableQuantity: { type: integer, format: int64 }
+        averageDailyDemand30: { type: number }
+        daysOfCover: { type: [number, 'null'] }
+        expiryDate: { type: [string, 'null'], format: date }
+        daysToExpiry: { type: [integer, 'null'], format: int64 }
+        inventoryValue: { type: number }
+        reason: { type: string }
+        recommendedAction: { type: string }
+
+    ImportJob:
+      type: object
+      required: [importJobId, tenantId, importMode, status, totalRows, acceptedRows, rejectedRows, ignoredRows]
+      properties:
+        importJobId: { type: string, format: uuid }
+        tenantId: { type: string }
+        importType: { type: string }
+        fileName: { type: string }
+        fileSha256: { type: string }
+        importMode: { type: string, enum: [VALIDATE_ONLY, UPSERT] }
+        status: { type: string, enum: [RUNNING, VALIDATED, COMPLETED, COMPLETED_WITH_ERRORS, REJECTED, FAILED] }
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: [string, 'null'], format: date-time }
+        totalRows: { type: integer, format: int64 }
+        acceptedRows: { type: integer, format: int64 }
+        rejectedRows: { type: integer, format: int64 }
+        ignoredRows: { type: integer, format: int64 }
+        message: { type: [string, 'null'] }
+    ImportError:
+      type: object
+      properties:
+        importErrorId: { type: string, format: uuid }
+        fileName: { type: string }
+        rowNumber: { type: integer, format: int64 }
+        errorCode: { type: string }
+        fieldName: { type: [string, 'null'] }
+        rejectedValue: { type: [string, 'null'] }
+        message: { type: string }

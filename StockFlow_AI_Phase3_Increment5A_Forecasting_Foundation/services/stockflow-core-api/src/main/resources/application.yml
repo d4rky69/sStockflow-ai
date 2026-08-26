@@ -1,0 +1,45 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: stockflow-core-api
+  profiles:
+    default: sprint1
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+        format_sql: false
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    clean-disabled: true
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,flyway
+  endpoint:
+    health:
+      show-details: always
+
+stockflow:
+  tenant-header: X-Tenant-ID
+  intelligence:
+    stockout-cover-days: 14
+    excess-cover-days: 90
+    near-expiry-days: 60
+    demand-surge-percent: 50

@@ -1,0 +1,66 @@
+<section class="gis-shell google-map-shell">
+  <header>
+    <div>
+      <span>NER LOGISTICS INTELLIGENCE · GOOGLE MAPS</span>
+      <h2>GPS tracking & GIS accessibility dashboard</h2>
+      <p>Fleetbase positions overlaid with operational corridors and official flood or landslide alert zones from Google Public Alerts.</p>
+    </div>
+    <div class="map-actions">
+      <button type="button" class="demo-button" (click)="startDemo()" [disabled]="routeLoading" *ngIf="demoMode !== 'running'">{{ routeLoading ? 'Computing route…' : (demoMode === 'paused' ? 'Resume demo' : 'Start live demo') }}</button>
+      <button type="button" (click)="pauseDemo()" *ngIf="demoMode === 'running'">Pause</button>
+      <button type="button" (click)="resetDemo()" *ngIf="demoMode !== 'idle'">Reset</button>
+      <button type="button" (click)="loadHazardAlerts()" [disabled]="hazardLoading">{{ hazardLoading ? 'Checking alerts…' : 'Refresh hazards' }}</button>
+      <button type="button" (click)="fitToNetwork()">Fit network</button>
+    </div>
+  </header>
+  <div class="map-wrap">
+    <div #map class="gis-map" aria-label="Google map of North Eastern Region fleet and accessibility"></div>
+    <div class="map-loading" *ngIf="loading"><i></i><strong>Loading Google Maps…</strong></div>
+    <div class="map-load-error" *ngIf="mapError"><strong>Google Maps unavailable</strong><span>{{ mapError }}</span><small>Use the OpenStreetMap fallback above or verify the browser-key restrictions.</small></div>
+    <section class="google-layer-control" *ngIf="!mapError && !loading" aria-label="Google map layers">
+      <button type="button" class="layer-control-toggle" [attr.aria-expanded]="layersPanelOpen" (click)="layersPanelOpen = !layersPanelOpen">
+        <span><i></i><strong>Map layers</strong></span><b>{{ layersPanelOpen ? '−' : '+' }}</b>
+      </button>
+      <div class="layer-control-body" *ngIf="layersPanelOpen">
+        <label *ngFor="let layer of mapLayers">
+          <input type="checkbox" [checked]="layer.enabled" (change)="toggleLayer(layer.key)">
+          <i [class]="layer.tone"></i>
+          <span><strong>{{ layer.label }}</strong><small>{{ layer.description }}</small></span>
+          <b>{{ layerCount(layer.key) }}</b>
+        </label>
+        <footer><button type="button" (click)="setAllLayers(true)">Show all</button><button type="button" (click)="setAllLayers(false)">Hide all</button></footer>
+      </div>
+    </section>
+    <div class="map-status" *ngIf="!mapError">
+      <article><i class="live"></i><span><strong>{{ positionedVehicles.length }}</strong> GPS positions</span></article>
+      <article><i class="waiting"></i><span><strong>{{ waitingVehicles }}</strong> awaiting GPS</span></article>
+      <article><i class="risk" [class.alerting]="activeHazards > 0"></i><span><strong>{{ activeHazards }}</strong> active hazards</span></article>
+      <article><i class="forecast"></i><span><strong>{{ forecastHazards }}</strong> future alerts</span></article>
+      <article><i class="asset"></i><span><strong>4</strong> GIS checkpoints</span></article>
+    </div>
+    <div class="hazard-feed-state" *ngIf="!mapError && !hazardLoading && !hazardError && !hazardAlerts.length">
+      <strong>No flood or landslide alerts returned</strong>
+      <span>Google Public Alerts was checked at {{ hazardLocationsMonitored }} route and fleet locations. Coverage depends on participating authorities.</span>
+    </div>
+    <div class="hazard-feed-state error" *ngIf="!mapError && hazardError">
+      <strong>Hazard feed unavailable</strong><span>{{ hazardError }}</span>
+    </div>
+    <div class="tracking-console" *ngIf="demoMode !== 'idle'">
+      <div class="tracking-title"><i [class.paused]="demoMode === 'paused'"></i><strong>{{ demoMode === 'completed' ? demoVehicleName + ' delivered' : demoVehicleName + ' · prototype GPS' }}</strong><b>{{ demoMode }}</b></div>
+      <div class="tracking-grid">
+        <span><small>Speed</small><strong>{{ demoSpeed }} km/h</strong></span>
+        <span><small>Progress</small><strong>{{ demoProgress | number:'1.0-0' }}%</strong></span>
+        <span><small>Route ETA</small><strong>{{ demoEtaMinutes }} min</strong></span>
+        <span><small>Next checkpoint</small><strong>{{ nextCheckpoint }}</strong></span>
+      </div>
+      <div class="demo-progress"><i [style.width.%]="demoProgress"></i></div>
+      <small>Accelerated SIH prototype · browser-generated coordinates</small>
+      <small class="route-source"><b>{{ routeSource }}</b> · {{ demoRouteLengthKm | number:'1.1-1' }} km road route</small>
+      <small class="route-warning" *ngIf="routeError">{{ routeError }}</small>
+    </div>
+    <div class="gps-notice" *ngIf="vehicles.length && !positionedVehicles.length && demoMode === 'idle' && !mapError">
+      <strong>No live coordinates yet</strong><span>Connect Fleetbase Navigator or telematics. `(0,0)` positions are intentionally hidden.</span>
+    </div>
+  </div>
+  <footer><span><b></b> Google Maps Platform · Fleetbase refresh every 15 seconds</span><span>Flood and landslide zones are official authority alerts via Google; absence of an alert does not prove safety.</span></footer>
+</section>

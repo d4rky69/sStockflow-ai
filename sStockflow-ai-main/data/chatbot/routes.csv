@@ -1,0 +1,7 @@
+route_id,origin_city,destination_city,distance_km,fastest_hours,cheapest_inr,carbon_kgco2e,route_type
+R-CHN-BLR-FAST,Chennai,Bengaluru,350,7.0,18500,420,Express road
+R-CHN-BLR-CHEAP,Chennai,Bengaluru,375,8.5,13200,450,Economy road
+R-CHN-BLR-GREEN,Chennai,Bengaluru,365,8.0,15800,292,Low-carbon road
+R-BLR-CHN-FAST,Bengaluru,Chennai,350,7.0,18500,420,Express road
+R-BLR-CHN-CHEAP,Bengaluru,Chennai,375,8.5,13200,450,Economy road
+R-BLR-CHN-GREEN,Bengaluru,Chennai,365,8.0,15800,292,Low-carbon road

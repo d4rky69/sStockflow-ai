@@ -1,0 +1,43 @@
+<section class="gis-shell">
+  <header>
+    <div>
+      <span>NER LOGISTICS INTELLIGENCE</span>
+      <h2>GPS tracking & GIS accessibility dashboard</h2>
+      <p>Fleetbase positions overlaid with operational corridors, infrastructure checkpoints and demonstrator disruption zones.</p>
+    </div>
+    <div class="map-actions">
+      <button type="button" class="demo-button" (click)="startDemo()" *ngIf="demoMode !== 'running'">{{ demoMode === 'paused' ? 'Resume demo' : 'Start live demo' }}</button>
+      <button type="button" (click)="pauseDemo()" *ngIf="demoMode === 'running'">Pause</button>
+      <button type="button" (click)="resetDemo()" *ngIf="demoMode !== 'idle'">Reset</button>
+      <button type="button" (click)="fitToNetwork()">Fit network</button>
+    </div>
+  </header>
+  <div class="map-wrap">
+    <div #map class="gis-map" aria-label="North Eastern Region fleet and accessibility map"></div>
+    <div class="map-status">
+      <article><i class="live"></i><span><strong>{{ positionedVehicles.length }}</strong> GPS positions</span></article>
+      <article><i class="waiting"></i><span><strong>{{ waitingVehicles }}</strong> awaiting GPS</span></article>
+      <article><i class="risk"></i><span><strong>3</strong> demo risk zones</span></article>
+      <article><i class="asset"></i><span><strong>4</strong> GIS checkpoints</span></article>
+    </div>
+    <div class="tracking-console" *ngIf="demoMode !== 'idle'">
+      <div class="tracking-title"><i [class.paused]="demoMode === 'paused'"></i><strong>{{ demoMode === 'completed' ? demoVehicleName + ' delivered' : demoVehicleName + ' · prototype GPS' }}</strong><b>{{ demoMode }}</b></div>
+      <div class="tracking-grid">
+        <span><small>Speed</small><strong>{{ demoSpeed }} km/h</strong></span>
+        <span><small>Progress</small><strong>{{ demoProgress | number:'1.0-0' }}%</strong></span>
+        <span><small>Route ETA</small><strong>{{ demoEtaMinutes }} min</strong></span>
+        <span><small>Next checkpoint</small><strong>{{ nextCheckpoint }}</strong></span>
+      </div>
+      <div class="demo-progress"><i [style.width.%]="demoProgress"></i></div>
+      <small>Accelerated SIH prototype · browser-generated coordinates</small>
+    </div>
+    <div class="gps-notice" *ngIf="vehicles.length && !positionedVehicles.length && demoMode === 'idle'">
+      <strong>No live coordinates yet</strong>
+      <span>Connect a Fleetbase Navigator driver or telematics device. `(0,0)` positions are intentionally hidden.</span>
+    </div>
+  </div>
+  <footer>
+    <span><b></b> Fleetbase positions refresh automatically every 15 seconds</span>
+    <span>Risk overlays are clearly marked demo data until live weather/GIS feeds are connected.</span>
+  </footer>
+</section>

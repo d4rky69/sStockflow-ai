@@ -1,0 +1,4 @@
+vehicle_id,vehicle_type,capacity_units,cost_per_km,emission_factor_kgco2e_per_tonne_km,available
+VAN-01,Van,1000,38,0.18,true
+TRUCK-01,Medium truck,5000,52,0.12,true
+TRUCK-02,Large truck,10000,68,0.10,false

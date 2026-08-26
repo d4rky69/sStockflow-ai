@@ -1,0 +1,804 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed && !sidebarHoverExpanded" [class.dark-theme]="darkMode">
+  <aside
+    class="sidebar"
+    (mouseenter)="expandSidebarOnHover()"
+    (mouseleave)="collapseSidebarAfterHover()">
+    <div class="brand">
+      <div class="brand-mark"><span></span><span></span><span></span></div>
+      <div class="brand-copy">
+        <strong>StockFlow AI</strong>
+        <small>Intelligent Inventory Network</small>
+      </div>
+    </div>
+
+    <nav class="nav-scroll">
+      <section *ngFor="let group of navGroups" class="nav-group">
+        <div class="nav-title" *ngIf="group.title">{{ group.title }}</div>
+        <button
+          *ngFor="let item of group.items"
+          class="nav-item"
+          [class.active]="activeView === item.view"
+          (click)="selectView(item.view)">
+          <span class="nav-icon">
+            <img *ngIf="item.icon.includes('.png')" [src]="item.icon" alt="" />
+            <ng-container *ngIf="!item.icon.includes('.png')">{{ item.icon }}</ng-container>
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+        </button>
+      </section>
+    </nav>
+
+    <button class="collapse-button" (click)="toggleSidebar()">
+      <span>{{ sidebarCollapsed ? '›' : '‹' }}</span>
+      <span class="nav-label">Collapse</span>
+    </button>
+  </aside>
+
+  <button
+    type="button"
+    class="mobile-sidebar-backdrop"
+    [class.visible]="!sidebarCollapsed"
+    aria-label="Close navigation menu"
+    (click)="sidebarCollapsed = true"
+  ></button>
+
+  <main class="main-area">
+    <div class="top-actions-pill" 
+         [class.auto-hide]="activeView !== 'dashboard' && !isPillHovered" 
+         (mouseenter)="onPillMouseEnter()"
+         (mouseleave)="onPillMouseLeave()"
+         (click)="$event.stopPropagation()">
+        <label class="tenant-picker">
+          <span>Tenant</span>
+          <select [(ngModel)]="selectedTenant" (ngModelChange)="onTenantChange()">
+            <option *ngFor="let tenant of tenants" [value]="tenant.id">{{ tenant.label }}</option>
+          </select>
+        </label>
+
+        <div class="topbar-control notification-control">
+          <button
+            type="button"
+            class="icon-button notification"
+            aria-label="Open notifications"
+            title="Notifications"
+            [attr.aria-expanded]="activeTopbarPanel === 'notifications'"
+            (click)="toggleTopbarPanel('notifications', $event)"
+          >
+            <img src="assets/nav-icons/icons8-notification-24.png" alt="Notifications" />
+            <b *ngIf="unreadNotificationCount() > 0">{{ unreadNotificationCount() }}</b>
+          </button>
+
+          <section class="topbar-popover notification-popover" role="dialog" aria-label="Notifications" *ngIf="activeTopbarPanel === 'notifications'">
+            <div class="popover-header">
+              <div><strong>Notifications</strong><small>{{ unreadNotificationCount() }} unread</small></div>
+              <button type="button" class="popover-text-button" (click)="markAllNotificationsRead()" [disabled]="unreadNotificationCount() === 0">Mark all read</button>
+            </div>
+            <div class="notification-list">
+              <button
+                type="button"
+                class="notification-item"
+                [class.unread]="!item.read"
+                *ngFor="let item of notifications"
+                (click)="openNotification(item)"
+              >
+                <span [class]="'notification-dot ' + item.tone"></span>
+                <span class="notification-copy"><strong>{{ item.title }}</strong><small>{{ item.detail }}</small><em>{{ item.time }}</em></span>
+              </button>
+            </div>
+            <button type="button" class="popover-footer" (click)="openHelpDestination('risks')">Open Risk & Alerts</button>
+          </section>
+        </div>
+
+        <div class="topbar-control help-control">
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Open help"
+            title="Help and shortcuts"
+            [attr.aria-expanded]="activeTopbarPanel === 'help'"
+            (click)="toggleTopbarPanel('help', $event)"
+          >?</button>
+
+          <section class="topbar-popover help-popover" role="dialog" aria-label="Help and shortcuts" *ngIf="activeTopbarPanel === 'help'">
+            <div class="popover-header"><div><strong>Help & shortcuts</strong><small>Quick access to StockFlow workspaces</small></div></div>
+            <div class="shortcut-row"><span>Focus global search</span><kbd>Ctrl / ⌘ + K</kbd></div>
+            <button type="button" class="menu-row" (click)="openHelpDestination('risks')"><span>△</span><span><strong>Review risk alerts</strong><small>Open operational and data-quality risks</small></span></button>
+            <button type="button" class="menu-row" (click)="openHelpDestination('integrations')"><span>⇩</span><span><strong>Import guidance</strong><small>Validate and inspect data-import jobs</small></span></button>
+            <button type="button" class="menu-row" (click)="copySupportDetails()"><span>⧉</span><span><strong>Copy support details</strong><small>Copy tenant, workspace and URL</small></span></button>
+          </section>
+        </div>
+
+        <div class="topbar-control theme-control">
+          <button
+            type="button"
+            class="icon-button"
+            [attr.aria-label]="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
+            [title]="darkMode ? 'Light theme' : 'Dark theme'"
+            (click)="toggleTheme()"
+          >{{ darkMode ? '☀' : '☼' }}</button>
+        </div>
+
+        <div class="topbar-control profile-control">
+          <button
+            type="button"
+            class="profile profile-button"
+            aria-label="Open profile menu"
+            [attr.aria-expanded]="activeTopbarPanel === 'profile'"
+            (click)="toggleTopbarPanel('profile', $event)"
+          >
+            <span class="avatar">{{ profileInitials() }}</span>
+            <span class="profile-copy"><strong>{{ profileName() }}</strong><small>{{ profileEmail() || data?.userRole || 'Inventory Manager' }}</small></span>
+            <span class="profile-chevron" [class.open]="activeTopbarPanel === 'profile'">⌄</span>
+          </button>
+
+          <section class="topbar-popover profile-popover" role="menu" aria-label="Profile menu" *ngIf="activeTopbarPanel === 'profile'">
+            <div class="profile-summary">
+              <span class="avatar large">{{ profileInitials() }}</span>
+              <div><strong>{{ profileName() }}</strong><small>{{ profileEmail() || data?.userRole || 'Inventory Manager' }}</small><em>{{ currentTenantLabel() }}</em></div>
+            </div>
+            <button type="button" class="menu-row" (click)="selectView('dashboard')"><span>⌂</span><span><strong>My dashboard</strong><small>Return to the tenant overview</small></span></button>
+            <button type="button" class="menu-row" (click)="selectView('settings')"><span>⚙</span><span><strong>Preferences</strong><small>Open the settings workspace</small></span></button>
+            <button type="button" class="menu-row danger" (click)="signOut()"><span>↪</span><span><strong>Sign out</strong><small>End this secure session</small></span></button>
+          </section>
+        </div>
+      </div>
+
+    <div class="topbar-toast" *ngIf="topbarToast" role="status" aria-live="polite">{{ topbarToast }}</div>
+
+    <section class="content" *ngIf="activeView === 'dashboard'">
+      <ng-container *ngIf="data as dashboard; else dashboardLoadingState">
+        <div class="welcome-row">
+          <div><h1>Good morning, {{ dashboard.userName.split(' ')[0] }}! <span>👋</span></h1><p>Here’s what’s happening with your inventory today.</p></div>
+          <button type="button" class="ask-ai" (click)="toggleCopilot($event)">✦ <span>Ask StockFlow AI</span></button>
+        </div>
+
+        <section class="kpi-grid">
+          <article *ngFor="let kpi of dashboard.kpis" class="card kpi-card">
+            <div class="kpi-icon" [style.background]="kpi.accent">{{ kpi.icon }}</div>
+            <div class="kpi-body"><span>{{ kpi.label }}</span><strong>{{ kpi.value }}</strong><small [class.positive]="kpi.intent === 'positive'" [class.negative]="kpi.intent === 'negative'">{{ kpi.direction === 'up' ? '↑' : '↓' }} {{ kpi.change }} <em>{{ kpi.comparison }}</em></small></div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="card risk-overview">
+            <div class="card-header"><h2>Inventory Risk Overview</h2><div><select aria-label="Warehouse filter" [(ngModel)]="selectedWarehouseId" (ngModelChange)="onDashboardWarehouseChange()"><option value="">All Warehouses</option><option *ngFor="let warehouse of warehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }} · {{ warehouse.city }}</option></select><button>⋮</button></div></div>
+            <div class="risk-body">
+              <div class="donut-wrap"><div class="donut" [style.background]="riskDonutStyle()"><div><strong>{{ dashboard.riskTotal }}</strong><span>Total Alerts</span></div></div></div>
+              <div class="legend">
+                <div *ngFor="let risk of dashboard.riskBreakdown"><i [style.background]="risk.color"></i><span>{{ risk.label }}</span><strong>{{ risk.count }}</strong><small>({{ risk.percentage }}%)</small></div>
+              </div>
+            </div>
+            <button class="card-cta" (click)="selectView('risks')">View All Risk Details <span>→</span></button>
+          </article>
+
+          <article class="card top-risks">
+            <div class="card-header"><h2>Top Operational Risks</h2><div><a (click)="selectView('risks')">View All</a><button>⋮</button></div></div>
+            <div class="risk-list">
+              <div *ngFor="let risk of dashboard.topRisks" class="risk-item">
+                <div class="risk-icon">{{ risk.icon }}</div>
+                <div class="risk-copy"><div><strong>{{ risk.product }}</strong><span [class]="'risk-badge ' + risk.badgeClass">{{ risk.type }}</span></div><small>{{ risk.batch ? 'Batch: ' + risk.batch + ' · ' : '' }}{{ risk.warehouse }} · {{ risk.detail }}</small></div>
+                <div class="risk-metric"><strong>{{ risk.quantity }}</strong><small [class.high]="risk.metricIntent === 'high'" [class.good]="risk.metricIntent === 'good'">{{ risk.metric }}</small></div>
+              </div>
+            </div>
+          </article>
+
+
+
+          <article class="card chart-card demand-card">
+            <div class="card-header"><h2>Demand Forecast <small>(Current deterministic baseline)</small></h2><a (click)="selectView('demand')">View Full Forecast</a></div>
+            <div class="chart-legend"><span><i class="actual-line"></i>Actual Demand</span><span><i class="forecast-line"></i>Forecast</span></div>
+            <svg viewBox="0 0 360 190" preserveAspectRatio="none" class="line-chart" aria-label="Demand forecast chart">
+              <g class="grid-lines"><line x1="12" y1="30" x2="348" y2="30"/><line x1="12" y1="70" x2="348" y2="70"/><line x1="12" y1="110" x2="348" y2="110"/><line x1="12" y1="150" x2="348" y2="150"/></g>
+              <rect x="198" y="20" width="150" height="140" rx="8" class="forecast-zone"/>
+              <polyline [attr.points]="actualPoints()" class="actual-path"/>
+              <polyline [attr.points]="forecastPoints()" class="forecast-path"/>
+            </svg>
+            <div class="x-labels"><span *ngFor="let label of dashboard.demandForecast.labels">{{ label }}</span></div>
+          </article>
+
+          <article class="card chart-card trend-card">
+            <div class="card-header"><h2>Inventory Value Snapshot</h2><select><option>Latest</option></select></div>
+            <svg viewBox="0 0 260 190" preserveAspectRatio="none" class="line-chart trend-chart" aria-label="Inventory value trend chart">
+              <defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18b76a" stop-opacity=".28"/><stop offset="1" stop-color="#18b76a" stop-opacity="0"/></linearGradient></defs>
+              <g class="grid-lines"><line x1="12" y1="30" x2="248" y2="30"/><line x1="12" y1="70" x2="248" y2="70"/><line x1="12" y1="110" x2="248" y2="110"/><line x1="12" y1="150" x2="248" y2="150"/></g>
+              <polygon [attr.points]="inventoryTrendPoints() + ' 248,170 12,170'" fill="url(#areaGradient)"/>
+              <polyline [attr.points]="inventoryTrendPoints()" class="trend-path"/>
+            </svg>
+            <div class="x-labels"><span *ngFor="let label of dashboard.inventoryTrend.labels">{{ label }}</span></div>
+          </article>
+
+          <article class="card recommendations-card">
+            <div class="card-header"><h2>Recommendations ({{ dashboard.recommendations.length }})</h2><a (click)="selectView('recommendations')">View All</a></div>
+            <div class="recommendation-list">
+              <div *ngFor="let recommendation of dashboard.recommendations" class="recommendation-item">
+                <div class="recommendation-icon">{{ recommendation.icon }}</div>
+                <div><strong>{{ recommendation.title }}</strong><small>{{ recommendation.subtitle }}</small></div>
+                <span>{{ recommendation.benefit }}<small>Benefit</small></span>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <footer class="network-bar">
+          <div *ngFor="let metric of dashboard.networkMetrics"><span>{{ metric.icon }}</span><strong>{{ metric.value }}</strong><small>{{ metric.label }}</small></div>
+          <div class="sync"><i></i> Data as of {{ dashboard.asOf }} <button (click)="onTenantChange()">⟳</button></div>
+        </footer>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'demand'">
+      <div class="page-heading">
+        <div><span class="eyebrow">PREDICTIVE INTELLIGENCE</span><h1>Demand Forecast</h1><p>Monitor demand, run calibrated multi-model forecasts and inspect confidence, accuracy and projected stockouts.</p></div>
+        <label class="filter-control"><span>Demand window</span><select [(ngModel)]="selectedWindowDays" (ngModelChange)="onDemandWindowChange()"><option [ngValue]="7">7 days</option><option [ngValue]="30">30 days</option><option [ngValue]="90">90 days</option><option [ngValue]="180">180 days</option></select></label>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading demand intelligence…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+
+      <section class="forecast-ops-grid">
+        <article class="card forecast-control-card">
+          <div class="workspace-card-header"><div><span class="eyebrow">FORECAST OPERATIONS</span><h2>Queue and run forecasts</h2><p>Controlled execution using the calibrated model-selection engine.</p></div><button class="secondary-button" (click)="loadForecastOperations()">Refresh</button></div>
+          <div class="forecast-control-form"><label><span>Horizon</span><select [(ngModel)]="forecastHorizon"><option [ngValue]="7">7 days</option><option [ngValue]="30">30 days</option><option [ngValue]="90">90 days</option></select></label><label><span>History</span><select [(ngModel)]="forecastHistory"><option [ngValue]="90">90 days</option><option [ngValue]="180">180 days</option><option [ngValue]="365">365 days</option></select></label><button class="secondary-button" [disabled]="forecastOpsBusy" (click)="queueForecast()">Queue forecast</button><button class="primary-button" [disabled]="forecastOpsBusy" (click)="processForecastQueue()">{{ forecastOpsBusy ? 'Working…' : 'Run next queued job' }}</button></div>
+          <p class="forecast-ops-message" *ngIf="forecastOpsMessage">{{ forecastOpsMessage }}</p>
+          <div class="forecast-job-list"><span>RECENT JOBS</span><div *ngFor="let job of forecastJobs | slice:0:6"><i [class]="job.status.toLowerCase()"></i><p><strong>{{ forecastStatusLabel(job.status) }}</strong><small>{{ job.horizonDays }}-day horizon · attempt {{ job.attemptNumber }} · {{ job.scheduledFor | date:'short' }}</small><em *ngIf="job.errorMessage">{{ job.errorMessage }}</em></p><button *ngIf="job.status === 'QUEUED'" (click)="cancelForecastJob(job)">Cancel</button><button *ngIf="job.status === 'FAILED' || job.status === 'COMPLETED_WITH_ERRORS' || job.status === 'CANCELLED'" (click)="retryForecastJob(job)">Retry</button></div><p class="empty-row forecast-empty" *ngIf="!forecastJobs.length"><strong>No queued or completed operational jobs</strong><span>Choose a horizon, queue a forecast, then run the next queued job. Existing persisted forecasts remain visible below.</span></p></div>
+        </article>
+
+        <article class="card forecast-schedule-card">
+          <div class="workspace-card-header"><div><span class="eyebrow">AUTOMATION</span><h2>Forecast schedules</h2><p>Schedules create durable queued jobs in Asia/Kolkata time.</p></div></div>
+          <div class="schedule-form"><input [(ngModel)]="scheduleName" placeholder="Schedule name"><select [(ngModel)]="scheduleCadence"><option>DAILY</option><option>WEEKLY</option></select><input type="number" min="0" max="23" [(ngModel)]="scheduleHour"><button class="primary-button" [disabled]="forecastOpsBusy" (click)="createForecastSchedule()">Create schedule</button></div>
+          <div class="schedule-list"><div *ngFor="let schedule of forecastSchedules"><span><strong>{{ schedule.scheduleName }}</strong><small>{{ schedule.cadence }} at {{ schedule.runHour }}:00 · next {{ schedule.nextRunAt | date:'short' }}</small></span><button [class.active]="schedule.active" [attr.title]="schedule.active ? 'Pause this schedule' : 'Activate this schedule'" (click)="toggleForecastSchedule(schedule)">{{ schedule.active ? 'Active' : 'Paused · click to activate' }}</button></div><p class="empty-row forecast-empty" *ngIf="!forecastSchedules.length"><strong>No automated schedule</strong><span>Create one above to generate durable forecast jobs in Asia/Kolkata time.</span></p></div>
+        </article>
+      </section>
+
+      <article class="card forecast-alert-card" *ngIf="forecastAlerts.length">
+        <div class="workspace-card-header"><div><span class="eyebrow">GOVERNANCE</span><h2>Forecast quality alerts</h2><p>Freshness, confidence, position failures and run failures generated after each job.</p></div><span>{{ forecastAlerts.length }} alerts</span></div>
+        <div class="forecast-alert-list"><div *ngFor="let alert of forecastAlerts | slice:0:8" [class.acknowledged]="alert.acknowledged"><i [class]="alert.severity.toLowerCase()"></i><span><strong>{{ forecastStatusLabel(alert.alertType) }}</strong><small>{{ alert.message }} · {{ alert.createdAt | date:'short' }}</small></span><button *ngIf="!alert.acknowledged" (click)="acknowledgeForecastAlert(alert)">Acknowledge</button><em *ngIf="alert.acknowledged">Acknowledged</em></div></div>
+      </article>
+
+      <ng-container *ngIf="demandSummary as summary">
+        <section class="metric-grid four">
+          <article class="metric-card"><span>Sales quantity</span><strong>{{ summary.salesQuantity | number }}</strong><small>{{ summary.transactionRows | number }} transaction rows</small></article>
+          <article class="metric-card"><span>Average daily demand</span><strong>{{ summary.averageDailyDemand | number:'1.0-2' }}</strong><small>{{ summary.windowDays }}-day window</small></article>
+          <article class="metric-card"><span>Gross sales value</span><strong>{{ summary.grossSalesValue | currency:'INR':'symbol':'1.0-0' }}</strong><small>{{ summary.skuCount }} SKUs across {{ summary.warehouseCount }} warehouses</small></article>
+          <article class="metric-card"><span>Fulfilment rate</span><strong>{{ summary.fulfilmentRatePercent | number:'1.2-2' }}%</strong><small>{{ summary.lostSalesQuantity | number }} lost-sales units</small></article>
+        </section>
+
+        <article class="card data-table-card persisted-forecast-card">
+          <div class="workspace-card-header"><div><span class="eyebrow">LATEST PERSISTED RUN</span><h2>Selected-model forecasts</h2><p>Each warehouse-SKU position uses the best calibrated eligible model from backtesting and diagnostic rules.</p></div><span class="live-badge">{{ latestForecasts.length }} POSITIONS</span></div>
+          <div class="table-scroll" *ngIf="latestForecasts.length; else noPersistedForecasts"><table><thead><tr><th>Position</th><th>Selected model</th><th>Pattern</th><th class="numeric">Forecast</th><th class="numeric">WAPE</th><th>Confidence</th><th>Stockout projection</th></tr></thead><tbody>
+            <tr *ngFor="let item of latestForecasts | slice:0:20"><td><strong>{{ item.skuName }}</strong><small>{{ item.warehouseName }} · {{ item.asOfDate | date:'mediumDate' }}</small></td><td><strong>{{ forecastStatusLabel(item.selectedModel) }}</strong><small>{{ forecastStatusLabel(item.selectedAggregation) }} · {{ item.trainingSampleCount }} samples</small></td><td><strong>{{ forecastStatusLabel(item.demandPattern) }}</strong><small>{{ item.diagnosticReasons.length ? forecastStatusLabel(item.diagnosticReasons[0]) : 'Eligible' }}</small></td><td class="numeric"><strong>{{ item.totalForecastQuantity | number:'1.0-2' }}</strong><small>{{ item.horizonDays }} days · {{ item.averageDailyForecast | number:'1.0-2' }}/day</small></td><td class="numeric"><strong>{{ item.wape | number:'1.1-2' }}%</strong><small>Bias {{ item.bias | number:'1.1-2' }}</small></td><td><span [class]="'forecast-confidence ' + item.confidence.toLowerCase()">{{ forecastStatusLabel(item.confidence) }}</span></td><td><strong>{{ item.projectedStockoutDate ? (item.projectedStockoutDate | date:'mediumDate') : 'No projected stockout' }}</strong><small *ngIf="item.inventoryDataAvailable">{{ item.usableInventory | number }} usable units</small><small *ngIf="!item.inventoryDataAvailable">Inventory data unavailable</small></td></tr>
+          </tbody></table></div>
+          <ng-template #noPersistedForecasts><div class="forecast-no-results"><strong>No persisted model forecast exists yet</strong><span>Queue and run a forecast above. StockFlow will not fabricate predicted demand.</span></div></ng-template>
+        </article>
+
+        <article class="card workspace-chart">
+          <div class="workspace-card-header"><div><h2>Historical demand versus descriptive baseline</h2><p>Weekly aggregate demand ending {{ demandTrend?.asOfDate }}. This moving average is a historical comparison; operational forecasts and their selected models are shown above.</p></div><span class="live-badge">DEMAND ANALYTICS</span></div>
+          <div class="chart-legend wide"><span><i class="actual-line"></i>Actual demand</span><span><i class="forecast-line"></i>Historical moving-average baseline</span></div>
+          <svg viewBox="0 0 900 290" preserveAspectRatio="none" class="wide-chart" aria-label="Demand trend chart">
+            <g class="grid-lines"><line x1="20" y1="50" x2="880" y2="50"/><line x1="20" y1="110" x2="880" y2="110"/><line x1="20" y1="170" x2="880" y2="170"/><line x1="20" y1="230" x2="880" y2="230"/></g>
+            <polyline [attr.points]="demandActualPoints()" class="actual-path"/>
+            <polyline [attr.points]="demandForecastPoints()" class="forecast-path"/>
+          </svg>
+          <div class="x-labels wide-labels"><span *ngFor="let label of demandTrend?.labels">{{ label }}</span></div>
+        </article>
+
+        <article class="card data-table-card">
+          <div class="workspace-card-header"><div><h2>Top demand positions</h2><p>Warehouse and SKU demand ranked by sales quantity.</p></div><span>{{ demandSkus.length }} positions</span></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>SKU</th><th>Warehouse</th><th class="numeric">Sales qty</th><th class="numeric">Avg/day</th><th class="numeric">Returns</th><th class="numeric">Lost sales</th><th class="numeric">Sales value</th></tr></thead>
+              <tbody><tr *ngFor="let item of demandSkus"><td><strong>{{ item.skuName }}</strong><small>{{ item.skuId }}</small></td><td><strong>{{ item.warehouseName }}</strong><small>{{ item.warehouseId }}</small></td><td class="numeric">{{ item.salesQuantity | number }}</td><td class="numeric">{{ item.averageDailyDemand | number:'1.0-2' }}</td><td class="numeric">{{ item.returnQuantity | number }}</td><td class="numeric" [class.negative-text]="item.lostSalesQuantity > 0">{{ item.lostSalesQuantity | number }}</td><td class="numeric">{{ item.grossSalesValue | currency:'INR':'symbol':'1.0-0' }}</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'risks'">
+      <div class="page-heading">
+        <div><span class="eyebrow">INTELLIGENCE</span><h1>Risk & Alerts</h1><p>Separate operational inventory risks from data-quality alerts before taking action.</p></div>
+        <button class="secondary-button" (click)="loadRiskWorkspace()">⟳ Refresh</button>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading inventory risks…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+
+      <ng-container *ngIf="riskSummary as summary">
+        <section class="metric-grid five">
+          <article class="metric-card critical"><span>Total alerts</span><strong>{{ summary.totalRisks }}</strong><small>{{ summary.criticalCount }} critical · {{ summary.highCount }} high</small></article>
+          <article class="metric-card"><span>Operational risks</span><strong>{{ operationalRiskCount() }}</strong><small>Actionable risk positions</small></article>
+          <article class="metric-card warning"><span>Stock / safety</span><strong>{{ summary.stockoutRiskCount + summary.safetyStockBreachCount }}</strong><small>Low-cover and safety breaches</small></article>
+          <article class="metric-card data-gap"><span>Inventory data gaps</span><strong>{{ summary.inventoryDataGapCount }}</strong><small>Reconcile before replenishment</small></article>
+          <article class="metric-card"><span>Exposure value</span><strong>{{ summary.riskExposureValue | currency:'INR':'symbol':'1.0-0' }}</strong><small>As of {{ summary.asOfDate }}</small></article>
+        </section>
+
+        <article class="card filter-bar">
+          <label><span>Alert type</span><select [(ngModel)]="selectedRiskType"><option *ngFor="let type of riskTypes" [value]="type.value">{{ type.label }}</option></select></label>
+          <label><span>Severity</span><select [(ngModel)]="selectedSeverity"><option value="">All severities</option><option value="CRITICAL">Critical</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option></select></label>
+          <label><span>Rows</span><select [(ngModel)]="riskLimit"><option [ngValue]="25">25</option><option [ngValue]="50">50</option><option [ngValue]="100">100</option><option [ngValue]="250">250</option></select></label>
+          <button class="primary-button" (click)="applyRiskFilters()">Apply filters</button>
+          <span class="result-count">{{ inventoryRisks.length }} records</span>
+        </article>
+
+        <article class="card data-table-card">
+          <div class="table-scroll">
+            <table class="risk-table">
+              <thead><tr><th>Severity</th><th>Risk</th><th>SKU / Batch</th><th>Warehouse</th><th class="numeric">Usable</th><th class="numeric">30-day demand</th><th class="numeric">Days cover</th><th>Reason and action</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let risk of inventoryRisks">
+                  <td><span [class]="'severity-pill ' + risk.severity.toLowerCase()">{{ risk.severity }}</span></td>
+                  <td><strong>{{ riskTypeLabel(risk.riskType) }}</strong><small>{{ risk.riskId }}</small></td>
+                  <td><strong>{{ risk.skuName }}</strong><small>{{ risk.skuId }}{{ risk.batchNumber ? ' · ' + risk.batchNumber : '' }}</small></td>
+                  <td><strong>{{ risk.warehouseName }}</strong><small>{{ risk.warehouseId }}</small></td>
+                  <td class="numeric">{{ risk.usableQuantity | number }}</td>
+                  <td class="numeric">{{ risk.sales30 | number }}</td>
+                  <td class="numeric">{{ risk.daysOfCover === null ? '—' : (risk.daysOfCover | number:'1.1-1') }}</td>
+                  <td class="reason-cell"><strong>{{ risk.reason }}</strong><small>{{ risk.recommendedAction }}</small></td>
+                </tr>
+                <tr *ngIf="!inventoryRisks.length"><td colspan="8" class="empty-row">No risks match the selected filters.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'inventory'">
+      <div class="page-heading"><div><span class="eyebrow">INTELLIGENCE</span><h1>Inventory Analytics</h1><p>Live demand coverage, data readiness and inventory-risk indicators for the selected tenant.</p></div></div>
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading inventory analytics…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+
+      <ng-container *ngIf="riskSummary as summary">
+        <section class="metric-grid four">
+          <article class="metric-card"><span>Demand-active SKUs</span><strong>{{ demandSummary?.skuCount || 0 }}</strong><small>{{ demandSummary?.warehouseCount || 0 }} warehouses</small></article>
+          <article class="metric-card"><span>Operational risks</span><strong>{{ operationalRiskCount() }}</strong><small>Excludes data gaps</small></article>
+          <article class="metric-card data-gap"><span>Inventory data gaps</span><strong>{{ summary.inventoryDataGapCount }}</strong><small>Missing warehouse-SKU snapshots</small></article>
+          <article class="metric-card"><span>Demand surge alerts</span><strong>{{ summary.demandSurgeCount }}</strong><small>Current deterministic threshold</small></article>
+        </section>
+
+        <section class="analytics-split">
+          <article class="card insight-panel">
+            <div class="workspace-card-header"><div><h2>Data-readiness assessment</h2><p>Operational decisions should use inventory positions with complete snapshots.</p></div></div>
+            <div class="insight-list">
+              <div><span>Operational stock and safety risks</span><strong>{{ summary.stockoutRiskCount + summary.safetyStockBreachCount }}</strong></div>
+              <div><span>Inventory data gaps</span><strong>{{ summary.inventoryDataGapCount }}</strong></div>
+              <div><span>Near-expiry / expired batches</span><strong>{{ summary.nearExpiryCount + summary.expiredCount }}</strong></div>
+              <div><span>Excess / slow-moving positions</span><strong>{{ summary.excessInventoryCount + summary.slowMovingCount }}</strong></div>
+            </div>
+            <button class="card-cta" (click)="selectView('risks')">Inspect detailed alerts <span>→</span></button>
+          </article>
+
+          <article class="card data-table-card compact-table">
+            <div class="workspace-card-header"><div><h2>Highest-demand positions</h2><p>Top 20 warehouse-SKU positions over the last 30 days.</p></div></div>
+            <div class="table-scroll">
+              <table><thead><tr><th>SKU</th><th>Warehouse</th><th class="numeric">Sales qty</th><th class="numeric">Avg/day</th></tr></thead><tbody><tr *ngFor="let item of demandSkus"><td><strong>{{ item.skuName }}</strong><small>{{ item.skuId }}</small></td><td>{{ item.warehouseName }}</td><td class="numeric">{{ item.salesQuantity | number }}</td><td class="numeric">{{ item.averageDailyDemand | number:'1.0-2' }}</td></tr></tbody></table>
+            </div>
+          </article>
+        </section>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'recommendations'">
+      <div class="page-heading"><div><span class="eyebrow">DECISION INTELLIGENCE</span><h1>Recommendations</h1><p>Live purchase and transfer decisions generated from inventory, demand, safety-stock, supplier, route and carbon evidence.</p></div><span class="live-badge">LIVE · HUMAN-GATED</span></div>
+      <section class="prototype-recommendations" *ngIf="prototypeRecommendations().length">
+        <div class="prototype-recommendation-heading"><div><span>LIVE PROTOTYPE</span><h2>Recommendations generated from your saved changes</h2><p>These update immediately when batch quantities, expiry dates or SKU safety-stock policies change.</p></div><strong>{{ prototypeRecommendations().length }} new signals</strong></div>
+        <article *ngFor="let recommendation of prototypeRecommendations()" [class]="'card prototype-recommendation ' + recommendation.tone">
+          <i></i><div><span>Updated-data recommendation</span><h3>{{ recommendation.title }}</h3><p>{{ recommendation.subtitle }}</p></div><strong>{{ recommendation.benefit }}</strong><button type="button" class="secondary-button" (click)="selectView(recommendation.target)">{{ recommendation.target === 'routes' ? 'Plan route' : 'Review inventory' }}</button>
+        </article>
+      </section>
+      <div class="inline-state" *ngIf="decisionRecommendationsLoading"><div class="spinner"></div><span>Calculating purchase and transfer alternatives…</span></div>
+      <div class="error-banner" *ngIf="decisionRecommendationsError"><strong>Recommendations unavailable</strong><span>{{ decisionRecommendationsError }}</span><button type="button" class="secondary-button" (click)="loadDecisionRecommendations()">Retry</button></div>
+      <section class="decision-summary" *ngIf="decisionRecommendations.length">
+        <article><span>Live decisions</span><strong>{{ decisionRecommendations.length }}</strong><small>Ranked by service risk and benefit</small></article>
+        <article><span>Transfer alternatives</span><strong>{{ decisionTypeCount('TRANSFER') }}</strong><small>Safety-stock protected</small></article>
+        <article><span>Data basis</span><strong>PostgreSQL</strong><small>Latest inventory and demand evidence</small></article>
+      </section>
+      <ng-container *ngIf="!decisionRecommendationsLoading">
+        <section class="recommendation-workspace" *ngIf="decisionRecommendations.length; else noDecisionRecommendations">
+          <article *ngFor="let recommendation of decisionRecommendations; let i = index" class="card recommendation-detail live-decision-card">
+            <div class="recommendation-rank">{{ i + 1 }}</div>
+            <div class="recommendation-detail-copy"><span>{{ recommendation.type }} · {{ recommendation.risk }} RISK</span><h2>{{ recommendation.title }}</h2><p>{{ recommendation.subtitle }}</p><small>{{ recommendation.skuId }} · {{ recommendation.confidence }}% confidence · as of {{ recommendation.asOf | date:'mediumDate' }}</small></div>
+            <div class="benefit-block"><span>{{ recommendation.primaryBenefitLabel }}</span><strong>{{ recommendation.primaryBenefit | currency:'INR':'symbol':'1.0-0':'en-IN' }}</strong><small *ngIf="recommendation.carbonKg !== undefined">{{ recommendation.carbonKg | number:'1.1-1' }} kg CO₂e estimated</small></div>
+            <div class="recommendation-actions"><button type="button" class="secondary-button" (click)="reviewDecisionRecommendation(recommendation)">Review evidence</button><button type="button" class="primary-button" (click)="continueDecisionRecommendation(recommendation)">{{ recommendation.type === 'TRANSFER' ? 'Plan transfer' : 'Plan purchase' }}</button></div>
+          </article>
+        </section>
+        <ng-template #noDecisionRecommendations><div class="proposal-empty" *ngIf="!decisionRecommendationsError"><strong>No action required</strong><span>No live position currently requires a safe purchase or transfer recommendation.</span></div></ng-template>
+      </ng-container>
+
+      <div class="decision-dialog-backdrop" *ngIf="selectedDecisionRecommendation as recommendation" (click)="closeDecisionRecommendation()">
+        <section class="decision-dialog" role="dialog" aria-modal="true" aria-labelledby="decision-title" (click)="$event.stopPropagation()">
+          <header><div><span>EXPLAINABLE {{ recommendation.type }} DECISION</span><h2 id="decision-title">{{ recommendation.title }}</h2><p>{{ recommendation.id }} · as of {{ recommendation.asOf | date:'mediumDate' }}</p></div><button type="button" aria-label="Close" (click)="closeDecisionRecommendation()">×</button></header>
+          <div class="decision-dialog-metrics"><span><small>Quantity</small><strong>{{ recommendation.quantity | number }} units</strong></span><span><small>Estimated cost</small><strong>{{ recommendation.cost | currency:'INR':'symbol':'1.0-0':'en-IN' }}</strong></span><span><small>Confidence</small><strong>{{ recommendation.confidence }}%</strong></span><span><small>Risk</small><strong>{{ recommendation.risk }}</strong></span></div>
+          <article><span>WHY THIS IS RECOMMENDED</span><p>{{ recommendation.explanation }}</p></article>
+          <div class="decision-evidence-grid"><article><span>EVIDENCE</span><ul><li *ngFor="let evidence of recommendation.evidence">{{ evidence }}</li></ul></article><article><span>ASSUMPTIONS &amp; LIMITS</span><ul><li *ngFor="let assumption of recommendation.assumptions">{{ assumption }}</li></ul></article></div>
+          <div class="human-gate-note"><strong>Human approval remains mandatory</strong><span>This recommendation does not move inventory, dispatch a vehicle or place a supplier order. The next screen creates a reviewable proposal.</span></div>
+          <footer><button type="button" class="secondary-button" (click)="closeDecisionRecommendation()">Close</button><button type="button" class="primary-button" (click)="continueDecisionRecommendation(recommendation)">Continue to {{ recommendation.type === 'TRANSFER' ? 'transfer' : 'purchase' }} planning</button></footer>
+        </section>
+      </div>
+    </section>
+
+
+    <section class="content workspace" *ngIf="activeView === 'warehouses'">
+      <div class="page-heading">
+        <div><span class="eyebrow">INVENTORY MASTER</span><h1>Warehouses</h1><p>Live warehouse capacity, cold-chain readiness and inventory footprint for the selected tenant.</p></div>
+        <div class="page-heading-actions"><span [class]="'data-source-badge ' + (foundationDataSource === 'LIVE API' ? 'live' : 'fallback')">{{ foundationDataSource }}</span><button class="secondary-button" (click)="loadWarehouseWorkspace()">⟳ Refresh</button></div>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading warehouse master data…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+      <div class="prototype-info-banner" *ngIf="pageNotice">{{ pageNotice }}</div>
+
+      <ng-container *ngIf="foundationSummary as foundation">
+        <section class="metric-grid four">
+          <article class="metric-card"><span>Warehouses</span><strong>{{ foundation.warehouseCount }}</strong><small>{{ warehouseCityCount() }} operating cities · {{ prototypeChangedCount('warehouses') }} updated</small></article>
+          <article class="metric-card"><span>Total capacity</span><strong>{{ totalWarehouseCapacity() | number }}</strong><small>Configured capacity units</small></article>
+          <article class="metric-card"><span>Cold-chain enabled</span><strong>{{ coldChainWarehouseCount() }}</strong><small>{{ warehouses.length - coldChainWarehouseCount() }} standard warehouses</small></article>
+          <article class="metric-card"><span>Inventory batches</span><strong>{{ foundation.batchCount }}</strong><small>Latest snapshot positions</small></article>
+        </section>
+
+        <section class="warehouse-grid">
+          <article *ngFor="let warehouse of filteredWarehouses()" class="card warehouse-card">
+            <div class="warehouse-card-header">
+              <div class="warehouse-symbol">⌂</div>
+              <div><span>{{ warehouse.warehouseId }} <em class="changed-marker" *ngIf="prototype.isChanged(prototypeCollection('warehouses'), warehouse.warehouseId)">Updated</em></span><h2>{{ warehouse.warehouseName }}</h2><p>{{ warehouse.city }}, {{ warehouse.state }}, {{ warehouse.country }}</p></div>
+              <div class="warehouse-card-actions"><span class="cold-chain-pill" [class.active]="warehouse.coldChainAvailable">{{ warehouse.coldChainAvailable ? 'Cold chain' : 'Standard' }}</span><button type="button" class="record-edit-button" (click)="startWarehouseEdit(warehouse)">Edit</button></div>
+            </div>
+            <div class="warehouse-stat-grid">
+              <div><span>Capacity</span><strong>{{ warehouse.capacityUnits | number }}</strong></div>
+              <div><span>Batch positions</span><strong>{{ warehouseBatchCount(warehouse.warehouseId) }}</strong></div>
+              <div><span>Usable units</span><strong>{{ warehouseUsableQuantity(warehouse.warehouseId) | number }}</strong></div>
+              <div><span>Inventory value</span><strong>{{ warehouseInventoryValue(warehouse.warehouseId) | currency:'INR':'symbol':'1.0-0' }}</strong></div>
+            </div>
+            <button
+              type="button"
+              class="card-cta warehouse-batch-button"
+              (click)="selectedWarehouseId = warehouse.warehouseId; selectView('batches')"
+            >
+              <span>Inspect warehouse batches</span>
+              <span class="warehouse-batch-button__arrow" aria-hidden="true">→</span>
+            </button>
+          </article>
+          <article class="card empty-workspace" *ngIf="!filteredWarehouses().length">No warehouses match the current search.</article>
+        </section>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'products'">
+      <div class="page-heading">
+        <div><span class="eyebrow">INVENTORY MASTER</span><h1>Products & SKUs</h1><p>Commercial, replenishment, shelf-life and FEFO settings from the live SKU master.</p></div>
+        <div class="page-heading-actions"><span [class]="'data-source-badge ' + (foundationDataSource === 'LIVE API' ? 'live' : 'fallback')">{{ foundationDataSource }}</span><button class="secondary-button" (click)="loadProductWorkspace()">⟳ Refresh</button></div>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading product and SKU data…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+      <div class="prototype-info-banner" *ngIf="pageNotice">{{ pageNotice }}</div>
+
+      <ng-container *ngIf="foundationSummary as foundation">
+        <section class="metric-grid four">
+          <article class="metric-card"><span>Products</span><strong>{{ foundation.productCount }}</strong><small>Parent product records</small></article>
+          <article class="metric-card"><span>SKUs</span><strong>{{ foundation.skuCount }}</strong><small>{{ filteredSkus().length }} shown · {{ prototypeChangedCount('skus') }} updated</small></article>
+          <article class="metric-card"><span>FEFO controlled</span><strong>{{ fefoSkuCount() }}</strong><small>Shelf-life managed SKUs</small></article>
+          <article class="metric-card"><span>Average gross margin</span><strong>{{ averageSkuMarginPercent() | number:'1.1-1' }}%</strong><small>Based on list price and unit cost</small></article>
+        </section>
+
+        <article class="card filter-bar master-filter-bar">
+          <label><span>Demand profile</span><select [(ngModel)]="selectedDemandProfile"><option value="">All profiles</option><option *ngFor="let profile of demandProfiles()" [value]="profile">{{ profile }}</option></select></label>
+          <label><span>FEFO requirement</span><select [(ngModel)]="selectedFefoFilter"><option value="ALL">All SKUs</option><option value="YES">FEFO required</option><option value="NO">No FEFO</option></select></label>
+          <div class="filter-summary"><span>Total minimum safety stock</span><strong>{{ totalMinimumSafetyStock() | number }} units</strong></div>
+          <span class="result-count">{{ filteredSkus().length }} records</span>
+        </article>
+
+        <article class="card data-table-card">
+          <div class="table-scroll">
+            <table class="sku-table">
+              <thead><tr><th>SKU</th><th>Product</th><th>Demand profile</th><th>Inventory policy</th><th class="numeric">Unit cost</th><th class="numeric">Selling price</th><th class="numeric">Margin</th><th>Shelf life</th><th></th></tr></thead>
+              <tbody>
+                <tr *ngFor="let sku of filteredSkus()">
+                  <td><strong>{{ sku.skuName }} <em class="changed-marker" *ngIf="prototype.isChanged(prototypeCollection('skus'), sku.skuId)">Updated</em></strong><small>{{ sku.skuId }} · {{ sku.baseUom }}</small></td>
+                  <td><strong>{{ sku.productId }}</strong><small>{{ sku.currency }}</small></td>
+                  <td><span class="profile-pill">{{ sku.demandProfile }}</span></td>
+                  <td><strong>{{ sku.minimumSafetyStock | number }} safety stock</strong><small>Reorder multiple: {{ sku.reorderMultiple | number }}</small></td>
+                  <td class="numeric">{{ sku.unitCost | currency:sku.currency:'symbol':'1.2-2' }}</td>
+                  <td class="numeric">{{ sku.sellingPrice | currency:sku.currency:'symbol':'1.2-2' }}</td>
+                  <td class="numeric"><strong>{{ skuMarginPercent(sku) | number:'1.1-1' }}%</strong></td>
+                  <td><strong>{{ sku.defaultShelfLifeDays === null ? 'Not configured' : sku.defaultShelfLifeDays + ' days' }}</strong><small>{{ sku.fefoRequired ? 'FEFO required' : 'Standard issue policy' }}</small></td>
+                  <td><button type="button" class="record-edit-button" (click)="startSkuEdit(sku)">Edit</button></td>
+                </tr>
+                <tr *ngIf="!filteredSkus().length"><td colspan="9" class="empty-row">No SKUs match the selected filters.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'batches'">
+      <div class="page-heading">
+        <div><span class="eyebrow">INVENTORY EXECUTION</span><h1>Batch Inventory</h1><p>Inspect usable, reserved, blocked and expiry-sensitive stock by warehouse and SKU.</p></div>
+        <div class="page-heading-actions"><span [class]="'data-source-badge ' + (foundationDataSource === 'LIVE API' ? 'live' : 'fallback')">{{ foundationDataSource }}</span><button class="secondary-button" (click)="loadBatchWorkspace()">⟳ Refresh</button></div>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading batch inventory…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+      <div class="prototype-info-banner" *ngIf="pageNotice">{{ pageNotice }}</div>
+
+      <ng-container *ngIf="foundationSummary">
+        <article class="card filter-bar batch-filter-bar">
+          <label><span>Warehouse</span><select [(ngModel)]="selectedWarehouseId"><option value="">All warehouses</option><option *ngFor="let warehouse of warehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }}</option></select></label>
+          <label><span>SKU</span><select [(ngModel)]="selectedSkuId"><option value="">All SKUs</option><option *ngFor="let sku of skus" [value]="sku.skuId">{{ sku.skuName }}</option></select></label>
+          <label><span>Expiry status</span><select [(ngModel)]="selectedExpiryFilter"><option value="ALL">All statuses</option><option value="EXPIRING">Near expiry</option><option value="EXPIRED">Expired</option><option value="HEALTHY">Healthy</option><option value="NO_EXPIRY">No expiry</option></select></label>
+          <button class="secondary-button" (click)="selectedWarehouseId = ''; selectedSkuId = ''; selectedExpiryFilter = 'ALL'; globalSearch = ''">Clear filters</button>
+          <span class="result-count">{{ filteredBatches().length }} records</span>
+        </article>
+
+        <section class="metric-grid five">
+          <article class="metric-card"><span>Usable quantity</span><strong>{{ totalBatchUsableQuantity() | number }}</strong><small>After reservations and blocks · {{ prototypeChangedCount('batches') }} updated</small></article>
+          <article class="metric-card"><span>Reserved quantity</span><strong>{{ totalBatchReservedQuantity() | number }}</strong><small>Allocated inventory</small></article>
+          <article class="metric-card warning"><span>Blocked quantity</span><strong>{{ totalBatchBlockedQuantity() | number }}</strong><small>Quality or operational hold</small></article>
+          <article class="metric-card critical"><span>Expiry attention</span><strong>{{ expiringBatchCount() }}</strong><small>Expired or within 60 days</small></article>
+          <article class="metric-card"><span>Usable inventory value</span><strong>{{ totalBatchInventoryValue() | currency:'INR':'symbol':'1.0-0' }}</strong><small>Filtered batch positions</small></article>
+        </section>
+
+        <article class="card data-table-card">
+          <div class="table-scroll">
+            <table class="batch-table">
+              <thead><tr><th>Status</th><th>Batch</th><th>SKU</th><th>Warehouse</th><th class="numeric">Available</th><th class="numeric">Reserved</th><th class="numeric">Blocked</th><th class="numeric">Usable</th><th>Expiry</th><th>Storage / movement</th><th></th></tr></thead>
+              <tbody>
+                <tr *ngFor="let batch of filteredBatches()">
+                  <td><span [class]="'batch-status ' + operationalStatusClass(batch)">{{ batchOperationalStatus(batch) }}</span></td>
+                  <td><strong>{{ batch.batchNumber }} <em class="changed-marker" *ngIf="prototype.isChanged(prototypeCollection('batches'), batch.batchInventoryId)">Updated</em></strong><small>Snapshot: {{ batch.snapshotDate }}</small></td>
+                  <td><strong>{{ batch.skuId }}</strong><small>{{ batch.unitCost | currency:batch.currency:'symbol':'1.2-2' }} per unit</small></td>
+                  <td><strong>{{ batch.warehouseId }}</strong><small>{{ batch.storageConditionCode }}</small></td>
+                  <td class="numeric">{{ batch.availableQuantity | number }}</td>
+                  <td class="numeric">{{ batch.reservedQuantity | number }}</td>
+                  <td class="numeric">{{ batch.blockedQuantity | number }}</td>
+                  <td class="numeric"><strong>{{ batch.usableQuantity | number }}</strong></td>
+                  <td><strong>{{ batch.expiryDate || 'Not applicable' }}</strong><small>{{ daysToExpiry(batch) === null ? 'No shelf-life control' : (daysToExpiry(batch) | number) + ' days from snapshot' }}</small></td>
+                  <td><strong>{{ batch.storageConditionCode }}</strong><small>{{ batch.lastMovementAt ? ('Last movement: ' + (batch.lastMovementAt | date:'medium')) : 'No movement timestamp' }}</small></td>
+                  <td><button type="button" class="record-edit-button" (click)="startBatchEdit(batch)">Adjust</button></td>
+                </tr>
+                <tr *ngIf="!filteredBatches().length"><td colspan="11" class="empty-row">No batch inventory matches the selected filters.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </ng-container>
+    </section>
+
+    <section class="content workspace" *ngIf="activeView === 'integrations'">
+      <div class="page-heading">
+        <div><span class="eyebrow">DATA OPERATIONS</span><h1>Data Imports</h1><p>Validate or upsert controlled StockFlow foundation and sales packages with complete import-job traceability.</p></div>
+        <button class="secondary-button" (click)="loadImportWorkspace()">⟳ Refresh history</button>
+      </div>
+
+      <div class="inline-state" *ngIf="pageLoading"><div class="spinner"></div><span>Loading import history…</span></div>
+      <div class="error-banner" *ngIf="pageError">{{ pageError }}</div>
+
+      <section class="import-layout">
+        <article class="card import-panel">
+          <div class="workspace-card-header"><div><h2>Run controlled import</h2><p>Use VALIDATE_ONLY before UPSERT. The tenant header is applied automatically.</p></div><span class="live-badge">AUDITED</span></div>
+          <div class="import-form">
+            <label><span>Package type</span><select [(ngModel)]="selectedImportPackage"><option value="SYNTHETIC_FOUNDATION">Foundation master data</option><option value="SYNTHETIC_SALES">Retailers and sales history</option></select></label>
+            <label><span>Mode</span><select [(ngModel)]="selectedImportMode"><option value="VALIDATE_ONLY">Validate only</option><option value="UPSERT">Upsert into database</option></select></label>
+            <label class="file-picker"><span>ZIP package</span><input type="file" accept=".zip,application/zip" (change)="onImportFileSelected($event)"><strong>{{ selectedImportFile?.name || 'Choose a ZIP package' }}</strong></label>
+            <label class="strict-toggle"><input type="checkbox" [(ngModel)]="strictImport"><span><strong>Strict validation</strong><small>Reject the package when any tenant-scoped row is invalid.</small></span></label>
+            <button class="primary-button import-button" [disabled]="importRunning || !selectedImportFile" (click)="runImport()">{{ importRunning ? 'Processing package…' : (selectedImportMode === 'VALIDATE_ONLY' ? 'Validate package' : 'Import package') }}</button>
+          </div>
+          <div class="error-banner import-message" *ngIf="importError">{{ importError }}</div>
+          <div class="import-result" *ngIf="importResult as result">
+            <div><span [class]="'status-pill ' + importStatusClass(result.status)">{{ result.status }}</span><strong>{{ result.message || 'Import operation completed' }}</strong></div>
+            <div class="import-result-counts"><span><strong>{{ result.acceptedRows | number }}</strong> accepted</span><span><strong>{{ result.rejectedRows | number }}</strong> rejected</span><span><strong>{{ result.ignoredRows | number }}</strong> ignored</span></div>
+          </div>
+        </article>
+
+        <article class="card import-guidance">
+          <div class="workspace-card-header"><div><h2>Safe import sequence</h2><p>Recommended operational control for every package.</p></div></div>
+          <ol>
+            <li><strong>Validate</strong><span>Check file structure, references and tenant ownership without changing data.</span></li>
+            <li><strong>Review counts</strong><span>Confirm accepted, rejected and ignored rows match the expected tenant scope.</span></li>
+            <li><strong>Upsert</strong><span>Insert new records and update existing records using idempotent keys.</span></li>
+            <li><strong>Inspect audit trail</strong><span>Retain the file hash, job status, timestamps and row-level errors.</span></li>
+          </ol>
+        </article>
+      </section>
+
+      <article class="card data-table-card import-history-card">
+        <div class="workspace-card-header"><div><h2>Recent import jobs</h2><p>{{ importJobs.length }} jobs returned for {{ selectedTenant }}</p></div></div>
+        <div class="table-scroll">
+          <table class="import-table">
+            <thead><tr><th>Status</th><th>Package</th><th>Mode</th><th>Started</th><th class="numeric">Total</th><th class="numeric">Accepted</th><th class="numeric">Rejected</th><th class="numeric">Ignored</th><th>Audit</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let job of importJobs">
+                <td><span [class]="'status-pill ' + importStatusClass(job.status)">{{ job.status }}</span></td>
+                <td><strong>{{ job.importType }}</strong><small>{{ job.fileName }}</small></td>
+                <td><strong>{{ job.importMode }}</strong><small>{{ job.importJobId }}</small></td>
+                <td><strong>{{ job.startedAt | date:'medium' }}</strong><small>{{ job.completedAt ? ('Completed ' + (job.completedAt | date:'short')) : 'In progress' }}</small></td>
+                <td class="numeric">{{ job.totalRows | number }}</td>
+                <td class="numeric">{{ job.acceptedRows | number }}</td>
+                <td class="numeric" [class.negative-text]="job.rejectedRows > 0">{{ job.rejectedRows | number }}</td>
+                <td class="numeric">{{ job.ignoredRows | number }}</td>
+                <td><button class="table-action" (click)="inspectImportJob(job)">View errors</button></td>
+              </tr>
+              <tr *ngIf="!importJobs.length"><td colspan="9" class="empty-row">No import jobs were returned for this tenant.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card import-errors" *ngIf="selectedImportJob as job">
+        <div class="workspace-card-header"><div><h2>Errors for {{ job.fileName }}</h2><p>{{ job.importJobId }} · {{ importErrors.length }} error records</p></div><button class="secondary-button" (click)="selectedImportJob = undefined; importErrors = []">Close</button></div>
+        <div class="table-scroll">
+          <table><thead><tr><th>Row</th><th>Error code</th><th>Field</th><th>Rejected value</th><th>Message</th></tr></thead><tbody>
+            <tr *ngFor="let item of importErrors"><td>{{ item.rowNumber }}</td><td><strong>{{ item.errorCode }}</strong></td><td>{{ item.fieldName || '—' }}</td><td>{{ item.rejectedValue || '—' }}</td><td>{{ item.message }}</td></tr>
+            <tr *ngIf="!importErrors.length"><td colspan="5" class="empty-row">No row-level errors were recorded for this import job.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+    </section>
+
+    <div class="master-editor-backdrop" *ngIf="activeEditor" (click)="cancelEditor()">
+      <aside class="master-editor" role="dialog" aria-modal="true" aria-label="Edit prototype record" (click)="$event.stopPropagation()">
+        <header><div><span>PROTOTYPE EDITOR</span><h2>{{ activeEditor === 'warehouse' ? 'Edit warehouse' : activeEditor === 'sku' ? 'Edit SKU policy' : 'Adjust batch inventory' }}</h2><p>Changes are validated, saved in this browser and reflected across related prototype screens.</p></div><button type="button" (click)="cancelEditor()" aria-label="Close editor">×</button></header>
+
+        <form *ngIf="activeEditor === 'warehouse' && warehouseDraft as draft" class="master-editor-form" (ngSubmit)="saveWarehouseEdit()">
+          <div class="editor-id"><span>Warehouse ID</span><strong>{{ draft.warehouseId }}</strong></div>
+          <label class="full"><span>Warehouse name</span><input name="warehouseName" [(ngModel)]="draft.warehouseName" required></label>
+          <label><span>City</span><input name="warehouseCity" [(ngModel)]="draft.city" required></label>
+          <label><span>State</span><input name="warehouseState" [(ngModel)]="draft.state" required></label>
+          <label class="full"><span>Capacity units</span><input name="warehouseCapacity" type="number" min="1" step="1" [(ngModel)]="draft.capacityUnits" required></label>
+          <label class="editor-checkbox full"><input name="warehouseColdChain" type="checkbox" [(ngModel)]="draft.coldChainAvailable"><i></i><span><strong>Cold-chain capable</strong><small>Allow temperature-controlled inventory and routes.</small></span></label>
+          <p class="editor-error" *ngIf="editorError">{{ editorError }}</p>
+          <footer><button type="button" class="secondary-button" (click)="cancelEditor()">Cancel</button><button type="submit" class="primary-button">Save warehouse</button></footer>
+        </form>
+
+        <form *ngIf="activeEditor === 'sku' && skuDraft as draft" class="master-editor-form" (ngSubmit)="saveSkuEdit()">
+          <div class="editor-id"><span>SKU ID</span><strong>{{ draft.skuId }}</strong></div>
+          <label class="full"><span>SKU name</span><input name="skuName" [(ngModel)]="draft.skuName" required></label>
+          <label><span>Unit cost</span><input name="skuUnitCost" type="number" min="0" step="0.01" [(ngModel)]="draft.unitCost"></label>
+          <label><span>Selling price</span><input name="skuSellingPrice" type="number" min="0" step="0.01" [(ngModel)]="draft.sellingPrice"></label>
+          <label><span>Minimum safety stock</span><input name="skuSafetyStock" type="number" min="0" step="1" [(ngModel)]="draft.minimumSafetyStock"></label>
+          <label><span>Reorder multiple</span><input name="skuReorderMultiple" type="number" min="1" step="1" [(ngModel)]="draft.reorderMultiple"></label>
+          <label><span>Demand profile</span><select name="skuDemandProfile" [(ngModel)]="draft.demandProfile"><option>STABLE</option><option>TRENDING</option><option>SEASONAL</option><option>INTERMITTENT</option><option>LUMPY</option></select></label>
+          <label><span>Shelf life days</span><input name="skuShelfLife" type="number" min="1" step="1" [(ngModel)]="draft.defaultShelfLifeDays" placeholder="Not configured"></label>
+          <label class="editor-checkbox full"><input name="skuFefo" type="checkbox" [(ngModel)]="draft.fefoRequired"><i></i><span><strong>Require FEFO allocation</strong><small>Issue the earliest-expiring eligible batch first.</small></span></label>
+          <p class="editor-error" *ngIf="editorError">{{ editorError }}</p>
+          <footer><button type="button" class="secondary-button" (click)="cancelEditor()">Cancel</button><button type="submit" class="primary-button">Save SKU policy</button></footer>
+        </form>
+
+        <form *ngIf="activeEditor === 'batch' && batchDraft as draft" class="master-editor-form" (ngSubmit)="saveBatchEdit()">
+          <div class="editor-id"><span>Batch</span><strong>{{ draft.batchNumber }} · {{ draft.skuId }}</strong></div>
+          <div class="editor-context full"><span>{{ draft.warehouseId }}</span><small>Current calculated signal: {{ batchOperationalStatus(draft) }}</small></div>
+          <label><span>Available quantity</span><input name="batchAvailable" type="number" min="0" step="1" [(ngModel)]="draft.availableQuantity"></label>
+          <label><span>Reserved quantity</span><input name="batchReserved" type="number" min="0" step="1" [(ngModel)]="draft.reservedQuantity"></label>
+          <label><span>Blocked quantity</span><input name="batchBlocked" type="number" min="0" step="1" [(ngModel)]="draft.blockedQuantity"></label>
+          <label><span>Calculated usable</span><input [value]="draft.availableQuantity - draft.reservedQuantity - draft.blockedQuantity" disabled></label>
+          <label><span>Expiry date</span><input name="batchExpiry" type="date" [(ngModel)]="draft.expiryDate"></label>
+          <label><span>Storage condition</span><select name="batchStorage" [(ngModel)]="draft.storageConditionCode"><option>AMBIENT</option><option>COOL</option><option>COLD_CHAIN_2_8C</option><option>FROZEN</option></select></label>
+          <p class="editor-error" *ngIf="editorError">{{ editorError }}</p>
+          <footer><button type="button" class="secondary-button" (click)="cancelEditor()">Cancel</button><button type="submit" class="primary-button">Save adjustment</button></footer>
+        </form>
+      </aside>
+    </div>
+
+    <section class="content workspace prototype-activity-page" *ngIf="activeView === 'activity'">
+      <header class="activity-heading">
+        <div><span class="eyebrow">PRESENTATION CONTROL</span><h1>Demo Activity</h1><p>Every prototype decision is saved in this browser and recorded here, so the complete user journey remains visible across screens and refreshes.</p></div>
+        <button type="button" class="reset-demo-button" (click)="resetPrototype()">Reset demo data</button>
+      </header>
+
+      <section class="activity-metrics">
+        <article class="card"><span>Saved changes</span><strong>{{ prototype.changeCount() }}</strong><small>Updated records and settings</small></article>
+        <article class="card"><span>Recorded actions</span><strong>{{ prototype.activities().length }}</strong><small>Newest actions appear first</small></article>
+        <article class="card"><span>Persistence</span><strong>Browser</strong><small>Survives navigation and refresh</small></article>
+        <article class="card"><span>Last updated</span><strong>{{ prototype.lastUpdatedAt() ? (prototype.lastUpdatedAt() | date:'shortTime') : 'Not yet' }}</strong><small>{{ prototype.lastUpdatedAt() ? (prototype.lastUpdatedAt() | date:'mediumDate') : 'Start the guided flow' }}</small></article>
+      </section>
+
+      <section class="activity-layout">
+        <article class="card activity-timeline">
+          <div class="workspace-card-header"><div><h2>Change history</h2><p>Auditable presentation evidence for local prototype actions.</p></div><span>{{ prototype.activities().length }} events</span></div>
+          <div class="activity-list" *ngIf="prototype.activities().length; else noPrototypeActivity">
+            <article *ngFor="let activity of prototype.activities()" [class]="'activity-entry ' + activity.tone">
+              <i></i>
+              <div><span>{{ activity.module }}</span><strong>{{ activity.title }}</strong><p>{{ activity.detail }}</p></div>
+              <time>{{ activity.timestamp | date:'short' }}</time>
+            </article>
+          </div>
+          <ng-template #noPrototypeActivity><div class="empty-activity"><i>↻</i><strong>No demo changes yet</strong><p>Follow the presentation journey to create an auditable sequence of decisions.</p></div></ng-template>
+        </article>
+
+        <aside class="card presentation-flow">
+          <div class="workspace-card-header"><div><h2>Guided user journey</h2><p>Use this sequence during the prototype presentation.</p></div></div>
+          <button type="button" (click)="selectView('risks')"><i>01</i><span><strong>Identify risk</strong><small>Show a stockout or expiry alert.</small></span><b>›</b></button>
+          <button type="button" (click)="selectView('transfers')"><i>02</i><span><strong>Approve transfer</strong><small>Choose an explainable stock movement.</small></span><b>›</b></button>
+          <button type="button" (click)="selectView('routes')"><i>03</i><span><strong>Optimize and dispatch</strong><small>Advance a route through approval and delivery.</small></span><b>›</b></button>
+          <button type="button" (click)="selectView('sustainability')"><i>04</i><span><strong>Verify impact</strong><small>Show updated emissions and waste savings.</small></span><b>›</b></button>
+          <button type="button" (click)="selectView('activity')"><i>05</i><span><strong>Show audit trail</strong><small>Return here to prove every change was retained.</small></span><b>✓</b></button>
+          <div class="flow-note"><strong>Prototype behavior</strong><p>This workflow uses deterministic demo data and browser storage. The same screens can later connect to secured backend APIs without changing the presentation flow.</p></div>
+        </aside>
+      </section>
+    </section>
+
+    <sf-fleet-workspace
+      *ngIf="activeView === 'fleet'"
+      [tenantLabel]="currentTenantLabel()"
+      [tenantId]="selectedTenant"
+    ></sf-fleet-workspace>
+
+    <sf-operations-workspace
+      *ngIf="activeOperationView() as operationView"
+      [view]="operationView"
+      [tenantLabel]="currentTenantLabel()"
+      [searchQuery]="globalSearch"
+    ></sf-operations-workspace>
+
+    <sf-admin-workspace
+      *ngIf="activeAdminView() as adminView"
+      [view]="adminView"
+      [tenantLabel]="currentTenantLabel()"
+      [searchQuery]="globalSearch"
+    ></sf-admin-workspace>
+
+    <section class="content workspace" *ngIf="!isImplementedView()">
+      <div class="placeholder-page card">
+        <div class="placeholder-icon">◫</div>
+        <span class="eyebrow">FRONTEND ROADMAP</span>
+        <h1>{{ pageTitle() }}</h1>
+        <p>This navigation item is wired and ready for its backend workflow. The current frontend delivers live intelligence, warehouse, product, batch-inventory and controlled data-import workspaces. This remaining item requires a future backend workflow.</p>
+        <button class="secondary-button" (click)="selectView('dashboard')">Return to dashboard</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<button
+  type="button"
+  class="copilot-launcher"
+  [class.open]="copilotOpen"
+  [attr.aria-expanded]="copilotOpen"
+  aria-label="Open StockFlow Copilot"
+  (click)="toggleCopilot($event)"
+>
+  <span class="copilot-launcher__glow"></span>
+  <span class="copilot-launcher__mark">✦</span>
+</button>
+
+<section
+  *ngIf="copilotOpen"
+  class="copilot-popover"
+  role="dialog"
+  aria-modal="false"
+  aria-label="StockFlow Copilot"
+  (click)="$event.stopPropagation()"
+>
+  <header class="copilot-popover__header">
+    <div class="copilot-popover__identity">
+      <span class="copilot-popover__logo">✦</span>
+      <div><strong>StockFlow Copilot</strong><small>Grounded inventory intelligence</small></div>
+    </div>
+    <button type="button" class="copilot-popover__close" aria-label="Close StockFlow Copilot" (click)="closeCopilot($event)">×</button>
+  </header>
+
+  <div class="copilot-popover__status"><span></span> Read-only · tenant-scoped answers</div>
+
+  <div class="copilot-popover__messages" #copilotMessages role="log" aria-live="polite">
+    <div *ngFor="let message of data?.copilotMessages" class="message" [class.user]="message.role === 'user'">
+      <div>{{ message.text }}</div><small>{{ message.timestamp }}</small>
+    </div>
+    <div class="copilot-typing" *ngIf="copilotLoading"><span></span><span></span><span></span> Checking StockFlow data…</div>
+  </div>
+
+  <div class="copilot-suggestions" *ngIf="!copilotLoading && (data?.copilotMessages?.length ?? 0) < 3">
+    <button type="button" (click)="useCopilotSuggestion('Which inventory is at the highest expiry risk?')">Highest expiry risk</button>
+    <button type="button" (click)="useCopilotSuggestion('Which medicines may stock out this week?')">Stockout risks</button>
+    <button type="button" (click)="useCopilotSuggestion('Where is excess stock available for transfer?')">Transfer options</button>
+  </div>
+
+  <form class="copilot-popover__input" (ngSubmit)="sendCopilotMessage()">
+    <input [(ngModel)]="copilotInput" name="copilotInput" autocomplete="off" placeholder="Ask about inventory, expiry or routes…" [disabled]="copilotLoading">
+    <button type="submit" aria-label="Send message" [disabled]="copilotLoading || !copilotInput.trim()">➤</button>
+  </form>
+</section>
+
+<ng-template #dashboardLoadingState>
+  <div class="loading-state"><div class="spinner"></div><p *ngIf="!error">Loading StockFlow data…</p><p *ngIf="error">{{ error }}</p></div>
+</ng-template>

@@ -1,0 +1,419 @@
+<section class="operations-page">
+  <div class="proposal-backdrop" *ngIf="orderDialogOpen" (click)="closeOrderDialog()">
+    <section class="proposal-dialog" role="dialog" aria-modal="true" aria-labelledby="order-dialog-title" (click)="$event.stopPropagation()">
+      <header><div><span>CUSTOMER ORDER</span><h2 id="order-dialog-title">Create order</h2></div><button type="button" aria-label="Close order form" (click)="closeOrderDialog()">×</button></header>
+      <div class="proposal-form">
+        <label><span>Customer name</span><input [(ngModel)]="orderForm.customerName" maxlength="200" placeholder="Customer or business name"></label>
+        <label><span>Customer city</span><input [(ngModel)]="orderForm.customerCity" maxlength="120" placeholder="Delivery city"></label>
+        <label><span>Order channel</span><select [(ngModel)]="orderForm.channel"><option>B2B Portal</option><option>EDI</option><option>Sales desk</option><option>Mobile app</option><option>API</option></select></label>
+        <label><span>Promised date and time</span><input type="datetime-local" [(ngModel)]="orderForm.promisedAt"></label>
+        <label><span>Fulfilment warehouse</span><select [(ngModel)]="orderForm.warehouseId"><option value="" disabled>Select a warehouse</option><option *ngFor="let warehouse of proposalWarehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }} · {{ warehouse.city }}</option></select></label>
+        <label><span>Product / SKU</span><select [(ngModel)]="orderForm.skuId"><option value="" disabled>Select a product</option><option *ngFor="let sku of proposalSkus" [value]="sku.skuId">{{ sku.skuName }} · {{ sku.skuId }}</option></select></label>
+        <label><span>Quantity</span><input type="number" min="1" step="1" [(ngModel)]="orderForm.quantity"></label>
+        <label><span>Unit selling price (optional)</span><input type="number" min="0" step="0.01" [(ngModel)]="orderForm.unitPrice" placeholder="Uses SKU selling price"></label>
+      </div>
+      <p class="proposal-error" *ngIf="orderError">{{ orderError }}</p>
+      <footer><span>Creates a persisted order. Shipment and inventory deduction remain separate controlled steps.</span><button type="button" class="dialog-primary" [disabled]="orderSaving" (click)="submitOrder()">{{ orderSaving ? 'Creating…' : 'Create order' }}</button></footer>
+    </section>
+  </div>
+  <div class="proposal-backdrop" *ngIf="proposalDialogOpen" (click)="closeProposalDialog()">
+    <section class="proposal-dialog" role="dialog" aria-modal="true" aria-labelledby="proposal-title" (click)="$event.stopPropagation()">
+      <header><div><span>HUMAN-GATED ACTION</span><h2 id="proposal-title">{{ selectedProposal ? shortProposalId(selectedProposal) : 'Create ' + proposalForm.type.toLowerCase() + ' proposal' }}</h2></div><button type="button" aria-label="Close proposal" (click)="closeProposalDialog()">×</button></header>
+      <ng-container *ngIf="!selectedProposal; else proposalReview">
+        <div class="proposal-form">
+          <label><span>Product / SKU</span><select [(ngModel)]="proposalForm.skuId"><option value="" disabled>Select a product</option><option *ngFor="let sku of proposalSkus" [value]="sku.skuId">{{ sku.skuName }} · {{ sku.skuId }}</option></select></label>
+          <label><span>Quantity</span><input type="number" min="1" [(ngModel)]="proposalForm.quantity"></label>
+          <label *ngIf="proposalForm.type === 'TRANSFER'"><span>Source warehouse</span><select [(ngModel)]="proposalForm.sourceWarehouseId"><option value="" disabled>Select source warehouse</option><option *ngFor="let warehouse of proposalWarehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }} · {{ warehouse.city }}</option></select></label>
+          <label><span>Destination warehouse</span><select [(ngModel)]="proposalForm.destinationWarehouseId"><option value="" disabled>Select destination warehouse</option><option *ngFor="let warehouse of proposalWarehouses" [value]="warehouse.warehouseId">{{ warehouse.warehouseName }} · {{ warehouse.city }}</option></select></label>
+          <label *ngIf="proposalForm.type === 'PURCHASE'"><span>Supplier reference</span><input [(ngModel)]="proposalForm.supplierReference" placeholder="Supplier name or code"></label>
+          <label><span>Unit cost (optional)</span><input type="number" min="0" [(ngModel)]="proposalForm.unitCost"></label>
+          <label *ngIf="proposalForm.type === 'TRANSFER'"><span>Transport cost (optional)</span><input type="number" min="0" [(ngModel)]="proposalForm.transportCost"></label>
+          <label class="full"><span>Business reason</span><textarea [(ngModel)]="proposalForm.reason" rows="3" placeholder="Why this action is required"></textarea></label>
+          <label class="full"><span>Recommendation evidence</span><textarea [(ngModel)]="proposalForm.recommendationEvidence" rows="3" placeholder="Forecast, stock, route and sustainability evidence"></textarea></label>
+        </div>
+        <p class="proposal-error" *ngIf="proposalError">{{ proposalError }}</p>
+        <footer><span>Creates a draft only. A separate user must approve it.</span><button type="button" class="dialog-primary" [disabled]="proposalSaving" (click)="saveProposal()">{{ proposalSaving ? 'Saving…' : 'Create draft proposal' }}</button></footer>
+      </ng-container>
+      <ng-template #proposalReview>
+        <div class="proposal-summary" *ngIf="selectedProposal as proposal">
+          <div><span>Status</span><strong [class]="'proposal-status ' + proposal.status.toLowerCase()">{{ proposalStatus(proposal.status) }}</strong></div>
+          <div><span>SKU / quantity</span><strong>{{ proposal.skuId }} · {{ proposal.quantity | number }} units</strong></div>
+          <div><span>Movement</span><strong>{{ proposal.sourceWarehouseId || proposal.supplierReference || 'Supplier TBD' }} → {{ proposal.destinationWarehouseId }}</strong></div>
+          <div><span>Created by</span><strong>{{ isProposalOwner(proposal) ? 'You (' + (auth.user()?.email || proposal.createdBy) + ')' : proposal.createdBy }}</strong></div>
+          <div class="full"><span>Reason</span><strong>{{ proposal.reason }}</strong></div>
+          <div class="full" *ngIf="proposal.recommendationEvidence"><span>Evidence</span><strong>{{ proposal.recommendationEvidence }}</strong></div>
+        </div>
+        <label class="review-comment"><span>Review comment</span><textarea rows="3" [(ngModel)]="reviewComment" placeholder="Required when rejecting; optional otherwise"></textarea></label>
+        <p class="proposal-error" *ngIf="proposalError">{{ proposalError }}</p>
+        <div class="proposal-history"><span>STATUS HISTORY</span><div *ngFor="let event of proposalHistory"><i></i><p><strong>{{ proposalStatus(event.toStatus) }}</strong><small>{{ event.changedAt | date:'medium' }} · {{ event.changedBy }}</small><em *ngIf="event.comment">{{ event.comment }}</em></p></div></div>
+        <div class="execution-panel" *ngIf="selectedExecution as detail">
+          <header><div><span>TRANSFER EXECUTION</span><h3>{{ proposalStatus(detail.execution.status) }}</h3></div><strong>{{ detail.execution.quantity | number }} units</strong></header>
+          <div class="execution-steps"><span [class.done]="detail.execution.status !== 'PLANNED'"><i>1</i>Reserved</span><span [class.done]="detail.execution.status === 'IN_TRANSIT' || detail.execution.status === 'RECEIVED'"><i>2</i>Dispatched</span><span [class.done]="detail.execution.status === 'RECEIVED'"><i>3</i>Received</span></div>
+          <div class="fleetbase-link-card" *ngIf="detail.fleetbaseOrderLink as link; else noFleetbaseLink">
+            <div><span>FLEETBASE ORDER LINK</span><strong>{{ link.fleetbaseInternalId }}</strong><small>{{ link.fleetbaseOrganizationId }} · {{ proposalStatus(link.status) }}</small></div>
+            <b [class.remote]="link.remoteWritePerformed">{{ link.status === 'DISPATCHED' ? 'Fleetbase dispatch confirmed' : (link.remoteWritePerformed ? 'Fleetbase order created · awaiting FEFO dispatch' : 'Prepared only · no remote write') }}</b>
+            <button type="button" *ngIf="(link.status === 'PREPARED' || link.status === 'FAILED') && (detail.execution.status === 'PLANNED' || detail.execution.status === 'RESERVED')" [disabled]="proposalSaving" (click)="createFleetbaseOrder()">{{ proposalSaving ? 'Creating…' : (link.status === 'FAILED' ? 'Retry order creation' : 'Create Fleetbase order') }}</button>
+          </div>
+          <ng-template #noFleetbaseLink>
+            <div class="fleetbase-link-empty" *ngIf="detail.execution.status === 'PLANNED' || detail.execution.status === 'RESERVED'">
+              <div><span>FLEETBASE HANDOFF</span><strong>Prepare an idempotent order link</strong><small>This saves the transfer-to-order identity without creating or dispatching a Fleetbase order.</small></div>
+              <button type="button" [disabled]="proposalSaving" (click)="prepareFleetbaseOrderLink()">{{ proposalSaving ? 'Preparing…' : 'Prepare link' }}</button>
+            </div>
+          </ng-template>
+          <div class="fleetbase-tracking-card" *ngIf="detail.fleetbaseOrderLink as link">
+            <header>
+              <div><span>LIVE FLEETBASE TRACKING</span><strong>{{ fleetbaseTracking?.remoteStatus || link.remoteStatus || 'Awaiting dispatch' }}</strong></div>
+              <div class="tracking-actions">
+                <button type="button" [disabled]="fleetbaseTrackingLoading || !link.remoteWritePerformed" (click)="refreshFleetbaseTracking(false)">{{ fleetbaseTrackingLoading ? 'Syncing…' : 'Refresh tracking' }}</button>
+                <button type="button" [disabled]="fleetbaseTrackingLoading || !link.remoteWritePerformed" (click)="refreshFleetbaseTracking(true)">Reconcile</button>
+              </div>
+            </header>
+            <div class="tracking-progress"><i [style.width.%]="fleetbaseTracking?.progressPercentage || link.progressPercentage || 0"></i></div>
+            <div class="tracking-metrics">
+              <p><span>Progress</span><strong>{{ (fleetbaseTracking?.progressPercentage || link.progressPercentage || 0) | number:'1.0-1' }}%</strong></p>
+              <p><span>Completion ETA</span><strong>{{ trackingDuration(fleetbaseTracking?.completionEtaSeconds || link.etaSeconds) }}</strong></p>
+              <p><span>Next destination</span><strong>{{ fleetbaseTracking?.currentDestination || 'Not reported' }}</strong></p>
+              <p><span>Reconciliation</span><strong [class.tracking-warning]="(fleetbaseTracking?.reconciliationStatus || link.reconciliationStatus) !== 'MATCHED'">{{ proposalStatus(fleetbaseTracking?.reconciliationStatus || link.reconciliationStatus) }}</strong></p>
+            </div>
+            <small *ngIf="fleetbaseTracking?.latitude !== undefined">Position {{ fleetbaseTracking?.latitude | number:'1.4-4' }}, {{ fleetbaseTracking?.longitude | number:'1.4-4' }} · Tracking {{ fleetbaseTracking?.trackingNumber || link.trackingNumber || link.fleetbaseOrderId }}</small>
+            <small *ngIf="fleetbaseTracking?.estimatedCompletionTime">Estimated completion {{ fleetbaseTracking?.estimatedCompletionTime | date:'medium' }}</small>
+          </div>
+          <div class="allocation-list" *ngIf="detail.allocations.length"><span>FEFO BATCH ALLOCATIONS</span><p *ngFor="let allocation of detail.allocations"><strong>{{ allocation.batchNumber }}</strong><small>{{ allocation.quantity }} units · expires {{ allocation.expiryDate }}</small></p></div>
+          <label class="review-comment"><span>Execution comment</span><textarea rows="2" [(ngModel)]="executionComment" placeholder="Operational note for the audit history"></textarea></label>
+          <div class="receipt-fields" *ngIf="detail.execution.status === 'IN_TRANSIT'"><label><span>Actual transport cost</span><input type="number" min="0" [(ngModel)]="actualTransportCost"></label><label><span>Actual CO2e (kg)</span><input type="number" min="0" [(ngModel)]="actualCarbonKg"></label></div>
+          <div class="execution-actions">
+            <button type="button" *ngIf="detail.execution.status === 'PLANNED' || detail.execution.status === 'RESERVED'" (click)="transitionExecution('cancel')">Cancel execution</button>
+            <button type="button" class="dialog-primary" *ngIf="detail.execution.status === 'PLANNED'" (click)="transitionExecution('reserve')">Reserve FEFO stock</button>
+            <button type="button" class="dialog-primary" *ngIf="detail.execution.status === 'RESERVED'" [disabled]="proposalSaving" (click)="transitionExecution('dispatch')">{{ detail.fleetbaseOrderLink?.status === 'CREATED' ? 'Dispatch Fleetbase order' : 'Mark dispatched' }}</button>
+            <button type="button" class="dialog-primary" *ngIf="detail.execution.status === 'IN_TRANSIT'" (click)="transitionExecution('receive')">Confirm receipt</button>
+          </div>
+          <div class="execution-events"><span>EXECUTION AUDIT</span><p *ngFor="let event of detail.events"><strong>{{ proposalStatus(event.toStatus) }}</strong><small>{{ event.occurredAt | date:'medium' }} · {{ event.comment }}</small></p></div>
+        </div>
+        <div class="execution-panel" *ngIf="selectedPurchaseOrder as detail">
+          <header><div><span>PURCHASE ORDER</span><h3>{{ proposalStatus(detail.purchaseOrder.status) }}</h3></div><strong>{{ detail.purchaseOrder.receivedQuantity | number }} / {{ detail.purchaseOrder.orderedQuantity | number }} units</strong></header>
+          <div class="execution-steps"><span [class.done]="detail.purchaseOrder.status !== 'PO_CREATED'"><i>1</i>Sent</span><span [class.done]="detail.purchaseOrder.status === 'ACKNOWLEDGED' || detail.purchaseOrder.status === 'PARTIALLY_RECEIVED' || detail.purchaseOrder.status === 'RECEIVED'"><i>2</i>Acknowledged</span><span [class.done]="detail.purchaseOrder.status === 'RECEIVED'"><i>3</i>Received</span></div>
+          <div class="allocation-list"><span>ORDER DETAILS</span><p><strong>{{ detail.purchaseOrder.supplierReference }}</strong><small>{{ detail.purchaseOrder.destinationWarehouseId }} · {{ detail.purchaseOrder.remainingQuantity | number }} units remaining</small></p><p *ngIf="detail.purchaseOrder.expectedDeliveryDate"><strong>Expected delivery</strong><small>{{ detail.purchaseOrder.expectedDeliveryDate | date:'mediumDate' }}</small></p></div>
+          <label class="review-comment"><span>Operational comment</span><textarea rows="2" [(ngModel)]="executionComment" placeholder="Note retained in the purchase-order audit history"></textarea></label>
+          <div class="receipt-fields" *ngIf="detail.purchaseOrder.status === 'SENT_TO_SUPPLIER'"><label><span>Supplier acknowledgement</span><input [(ngModel)]="poAcknowledgement" placeholder="Reference (optional)"></label><label><span>Expected delivery</span><input type="date" [(ngModel)]="poExpectedDate"></label></div>
+          <div class="proposal-form" *ngIf="detail.purchaseOrder.status === 'ACKNOWLEDGED' || detail.purchaseOrder.status === 'PARTIALLY_RECEIVED'"><label><span>Receipt quantity</span><input type="number" min="1" [max]="detail.purchaseOrder.remainingQuantity" [(ngModel)]="receiptQuantity"></label><label><span>Batch number</span><input [(ngModel)]="receiptBatchNumber" placeholder="Supplier batch number"></label><label><span>Manufacture date</span><input type="date" [(ngModel)]="receiptManufactureDate"></label><label><span>Expiry date</span><input type="date" [(ngModel)]="receiptExpiryDate"></label><label><span>Storage condition</span><select [(ngModel)]="receiptStorage"><option>AMBIENT</option><option>CHILLED</option><option>FROZEN</option></select></label></div>
+          <div class="allocation-list" *ngIf="detail.receipts.length"><span>RECEIPTS</span><p *ngFor="let receipt of detail.receipts"><strong>{{ receipt.batchNumber }} · {{ receipt.quantity | number }} units</strong><small>Expires {{ receipt.expiryDate | date:'mediumDate' }} · received {{ receipt.receivedAt | date:'short' }}</small></p></div>
+          <div class="execution-actions"><button type="button" *ngIf="detail.purchaseOrder.status === 'PO_CREATED' || detail.purchaseOrder.status === 'SENT_TO_SUPPLIER' || detail.purchaseOrder.status === 'ACKNOWLEDGED'" (click)="transitionPurchaseOrder('cancel')">Cancel order</button><button type="button" class="dialog-primary" *ngIf="detail.purchaseOrder.status === 'PO_CREATED'" (click)="transitionPurchaseOrder('send')">Mark sent to supplier</button><button type="button" class="dialog-primary" *ngIf="detail.purchaseOrder.status === 'SENT_TO_SUPPLIER'" (click)="transitionPurchaseOrder('acknowledge')">Record acknowledgement</button><button type="button" class="dialog-primary" *ngIf="detail.purchaseOrder.status === 'ACKNOWLEDGED' || detail.purchaseOrder.status === 'PARTIALLY_RECEIVED'" (click)="transitionPurchaseOrder('receive')">Confirm inventory receipt</button></div>
+          <div class="execution-events"><span>PURCHASE AUDIT</span><p *ngFor="let event of detail.events"><strong>{{ proposalStatus(event.toStatus) }}</strong><small>{{ event.occurredAt | date:'medium' }} · {{ event.comment }}</small></p></div>
+        </div>
+        <footer class="review-actions" *ngIf="selectedProposal as proposal">
+          <span *ngIf="proposal.status === 'DRAFT' && isProposalOwner(proposal)">You created this draft. Submit it before switching to the approver account.</span>
+          <span *ngIf="proposal.status === 'DRAFT' && !isProposalOwner(proposal)">Only the account that created this draft can submit it. Sign back in as the creator.</span>
+          <span *ngIf="proposal.status === 'PENDING_APPROVAL' && isProposalOwner(proposal)">You submitted this proposal. A different authorised user must review it.</span>
+          <span *ngIf="proposal.status === 'PENDING_APPROVAL' && !isProposalOwner(proposal)">Review the evidence before approving or rejecting. Approval does not execute inventory movement.</span>
+          <button type="button" *ngIf="proposal.status === 'DRAFT' && isProposalOwner(proposal)" [disabled]="proposalSaving" (click)="transitionProposal('cancel')">Cancel</button>
+          <button type="button" class="dialog-primary" *ngIf="proposal.status === 'DRAFT' && isProposalOwner(proposal)" [disabled]="proposalSaving" (click)="transitionProposal('submit')">Submit for approval</button>
+          <button type="button" class="danger-action" *ngIf="proposal.status === 'PENDING_APPROVAL' && !isProposalOwner(proposal)" [disabled]="proposalSaving" (click)="transitionProposal('reject')">Reject</button>
+          <button type="button" class="dialog-primary" *ngIf="proposal.status === 'PENDING_APPROVAL' && !isProposalOwner(proposal)" [disabled]="proposalSaving" (click)="transitionProposal('approve')">Approve proposal</button>
+          <span *ngIf="proposal.status === 'APPROVED' && proposal.proposalType === 'TRANSFER' && !selectedExecution">An operational manager must create the execution, reserve stock and dispatch it.</span>
+          <button type="button" class="dialog-primary" *ngIf="proposal.status === 'APPROVED' && proposal.proposalType === 'TRANSFER' && !selectedExecution" [disabled]="proposalSaving" (click)="createExecution()">Create transfer execution</button>
+          <span *ngIf="proposal.status === 'APPROVED' && proposal.proposalType === 'PURCHASE' && !selectedPurchaseOrder">An operational manager must convert this approval into a controlled purchase order.</span>
+          <label *ngIf="proposal.status === 'APPROVED' && proposal.proposalType === 'PURCHASE' && !selectedPurchaseOrder"><span>Expected delivery</span><input type="date" [(ngModel)]="poExpectedDate"></label>
+          <button type="button" class="dialog-primary" *ngIf="proposal.status === 'APPROVED' && proposal.proposalType === 'PURCHASE' && !selectedPurchaseOrder" [disabled]="proposalSaving" (click)="createPurchaseOrder()">Create purchase order</button>
+        </footer>
+      </ng-template>
+    </section>
+  </div>
+  <header class="operations-heading">
+    <div>
+      <span class="eyebrow">{{ pageCopy.eyebrow }}</span>
+      <h1>{{ pageCopy.title }}</h1>
+      <p>{{ pageCopy.description }}</p>
+    </div>
+    <button type="button" class="primary-action" (click)="triggerPrimaryAction()"><span>＋</span>{{ pageCopy.action }}</button>
+  </header>
+
+  <div class="prototype-note">
+    <span>INTERACTIVE PROTOTYPE</span>
+    <p *ngIf="view !== 'transfers' && view !== 'purchase'">Built for {{ tenantLabel }} with representative operational data. Changes are saved in this browser and remain after refresh.</p>
+    <p *ngIf="view === 'transfers' || view === 'purchase'">Recommendations are representative; proposals and approval history are persisted through the secured StockFlow Action API.</p>
+    <div class="prototype-save-state"><i></i><strong>{{ prototype.changeCount() }} saved changes</strong><small *ngIf="prototype.lastUpdatedAt()">Updated {{ prototype.lastUpdatedAt() | date:'shortTime' }}</small></div>
+  </div>
+
+  <article class="filter-card">
+    <label><span>Status</span><select [(ngModel)]="statusFilter"><option value="ALL">All statuses</option><option *ngFor="let status of statuses()" [value]="status">{{ status }}</option></select></label>
+    <label><span>{{ view === 'purchase' ? 'Supplier' : 'Location' }}</span><select [(ngModel)]="locationFilter"><option value="ALL">All {{ view === 'purchase' ? 'suppliers' : 'locations' }}</option><option *ngFor="let location of locations()" [value]="location">{{ location }}</option></select></label>
+    <div class="filter-context"><span>Workspace search</span><strong>{{ searchQuery || 'No search applied' }}</strong></div>
+    <button type="button" class="clear-action" (click)="statusFilter = 'ALL'; locationFilter = 'ALL'">Clear filters</button>
+  </article>
+
+  <article class="panel proposal-queue" *ngIf="view === 'transfers' || view === 'purchase'">
+    <div class="panel-heading">
+      <div><span>LIVE APPROVAL WORKFLOW</span><h2>{{ view === 'transfers' ? 'Transfer proposals' : 'Purchase proposals' }}</h2><p>Saved in PostgreSQL with tenant access, independent review and an auditable status history.</p></div>
+      <button type="button" class="refresh-proposals" (click)="loadProposals()" [disabled]="proposalsLoading">{{ proposalsLoading ? 'Refreshing…' : 'Refresh' }}</button>
+    </div>
+    <p class="proposal-error" *ngIf="proposalError && !proposalDialogOpen">{{ proposalError }}</p>
+    <div class="proposal-empty" *ngIf="!proposalsLoading && !visibleProposals().length"><strong>No persisted proposals yet</strong><span>Create one from a recommendation below or use the primary action.</span></div>
+    <div class="proposal-cards" *ngIf="visibleProposals().length">
+      <button type="button" *ngFor="let proposal of visibleProposals()" (click)="reviewProposal(proposal)">
+        <span><strong>{{ shortProposalId(proposal) }}</strong><small>{{ proposal.skuId }} · {{ proposal.quantity | number }} units</small></span>
+        <span><strong>{{ proposal.destinationWarehouseId }}</strong><small>{{ proposal.updatedAt | date:'short' }}</small></span>
+        <em [class]="'proposal-status ' + (executionFor(proposal)?.status || proposal.status).toLowerCase()">{{ executionFor(proposal) ? 'Execution: ' + proposalStatus(executionFor(proposal)!.status) : proposalStatus(proposal.status) }}</em>
+      </button>
+    </div>
+    <div class="execution-boundary"><strong>Approval is not execution</strong><span>An approved proposal does not change inventory, dispatch a vehicle or place a supplier order.</span></div>
+  </article>
+
+  <ng-container [ngSwitch]="view">
+    <ng-container *ngSwitchCase="'transfers'">
+      <section class="metric-grid">
+        <article><span>Recommended moves</span><strong>{{ transfers.length }}</strong><small>{{ transferCount('Awaiting approval') }} awaiting approval</small><i class="metric-icon indigo">⇄</i></article>
+        <article><span>Units rebalanced</span><strong>{{ transferUnits() | number }}</strong><small>Across {{ locations().length }} network nodes</small><i class="metric-icon blue">▦</i></article>
+        <article><span>Stockouts avoided</span><strong>3</strong><small>Estimated next 7 days</small><i class="metric-icon green">✓</i></article>
+        <article><span>CO₂ avoided</span><strong>{{ transferCo2Saved() | number:'1.1-1' }} kg</strong><small>Versus emergency procurement</small><i class="metric-icon teal">♻</i></article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel route-panel">
+          <div class="panel-heading"><div><span>OPTIMIZED NETWORK</span><h2>Transfer route sequence</h2></div><span class="optimization-badge">12.6% fewer km</span></div>
+          <div class="route-line">
+            <div><i>01</i><strong>Chennai</strong><small>2 dispatches</small></div><span><em>347 km</em></span><div><i>02</i><strong>Bengaluru</strong><small>1 cross-dock</small></div><span><em>148 km</em></span><div><i>03</i><strong>Mysuru</strong><small>Final delivery</small></div>
+          </div>
+          <div class="route-footer"><span><strong>8h 35m</strong> planned transit</span><span><strong>92%</strong> vehicle utilization</span><span><strong>₹18.4K</strong> avoided expedite cost</span></div>
+        </article>
+        <article class="panel sustainability-panel">
+          <div class="panel-heading"><div><span>SUSTAINABILITY</span><h2>Network impact</h2></div><span class="leaf-mark">⌁</span></div>
+          <div class="impact-score"><strong>84</strong><span>/ 100<small>Eco-efficiency score</small></span></div>
+          <div class="impact-bars"><div><span>Route consolidation</span><i><b style="width:88%"></b></i><strong>88%</strong></div><div><span>Waste prevention</span><i><b style="width:74%"></b></i><strong>74%</strong></div><div><span>Load utilization</span><i><b style="width:92%"></b></i><strong>92%</strong></div></div>
+        </article>
+      </section>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>DECISION QUEUE</span><h2>Recommended transfers</h2><p>Ranked by service risk, available source stock and route efficiency.</p></div><span>{{ filteredTransfers().length }} records</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Transfer</th><th>Product</th><th>Route</th><th class="numeric">Quantity</th><th>Impact</th><th>ETA</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredTransfers()">
+            <td><strong>{{ item.id }} <em class="changed-marker" *ngIf="prototype.isChanged('transfers', item.id)">Updated</em></strong><small><span [class]="'priority-dot ' + statusClass(item.priority)"></span>{{ item.priority }} priority</small></td>
+            <td><strong>{{ item.product }}</strong><small>{{ item.sku }} · {{ item.reason }}</small></td>
+            <td><strong>{{ item.from }} → {{ item.to }}</strong><small>{{ item.distanceKm }} km optimized lane</small></td>
+            <td class="numeric"><strong>{{ item.quantity | number }}</strong><small>units</small></td>
+            <td><strong class="positive-text">+{{ item.serviceLift }}% service</strong><small>{{ item.co2SavedKg }} kg CO₂ avoided</small></td>
+            <td><strong>{{ item.eta }}</strong><small>Route-aware estimate</small></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+            <td><button type="button" class="row-action" [disabled]="item.status !== 'Awaiting approval'" (click)="approveTransfer(item)">{{ item.status === 'Awaiting approval' ? 'Review & approve' : 'View plan' }}</button></td>
+          </tr><tr *ngIf="!filteredTransfers().length"><td colspan="8" class="empty-row">No transfers match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'routes'">
+      <section class="metric-grid">
+        <article><span>Active route plans</span><strong>{{ routePlans.length }}</strong><small>{{ filteredRoutes().length }} visible with current filters</small><i class="metric-icon indigo">◎</i></article>
+        <article><span>Distance avoided</span><strong>{{ totalRouteKmSaved() | number }} km</strong><small>Compared with direct baseline lanes</small><i class="metric-icon blue">↘</i></article>
+        <article><span>Average load factor</span><strong>{{ averageLoadUtilization() | number:'1.0-0' }}%</strong><small>Vehicle capacity utilization</small><i class="metric-icon green">▦</i></article>
+        <article><span>Estimated CO₂e avoided</span><strong>{{ routeCo2Saved() | number:'1.1-1' }} kg</strong><small>Subject to distance and vehicle assumptions</small><i class="metric-icon teal">♻</i></article>
+      </section>
+
+      <section class="route-design-grid">
+        <article class="panel route-map-panel">
+          <div class="panel-heading"><div><span>SELECTED PLAN · {{ selectedRoute().id }}</span><h2>{{ selectedRoute().lane }}</h2><p>Capacity-aware stop sequence and transfer consolidation preview</p></div><span class="optimization-badge">{{ selectedRoute().baselineKm - selectedRoute().optimizedKm }} km saved</span></div>
+          <div class="route-map-canvas">
+            <div class="map-chip"><i></i>Optimized sequence</div>
+            <div class="map-route">
+              <ng-container *ngFor="let stop of selectedRoute().stops; let index = index; let last = last">
+                <div class="map-stop" [class.destination]="last"><i>{{ index + 1 }}</i><span><strong>{{ stop }}</strong><small>{{ index === 0 ? 'Dispatch and load' : last ? 'Final receiving node' : 'Consolidation stop' }}</small></span></div>
+                <span class="map-connector" *ngIf="!last"><b></b><em>{{ index === 0 ? 'Priority lane' : 'Final leg' }}</em></span>
+              </ng-container>
+            </div>
+          </div>
+          <div class="route-summary-strip">
+            <span><small>Optimized distance</small><strong>{{ selectedRoute().optimizedKm }} km</strong></span>
+            <span><small>Planned duration</small><strong>{{ selectedRoute().duration }}</strong></span>
+            <span><small>Load utilization</small><strong>{{ selectedRoute().loadKg / selectedRoute().capacityKg | percent:'1.0-0' }}</strong></span>
+            <span><small>Estimated route cost</small><strong>{{ selectedRoute().costInr | currency:'INR':'symbol':'1.0-0' }}</strong></span>
+            <span><small>Estimated emissions</small><strong>{{ selectedRoute().co2Kg }} kg CO₂e</strong></span>
+          </div>
+        </article>
+
+        <aside class="panel optimization-control">
+          <div class="panel-heading"><div><span>OPTIMIZATION SETUP</span><h2>Planning constraints</h2><p>Change the ranking objective before generating plans.</p></div><i class="control-mark">⚙</i></div>
+          <div class="control-form">
+            <label><span>Optimization objective</span><select [(ngModel)]="routeObjective"><option>Balanced cost and carbon</option><option>Lowest transport cost</option><option>Lowest carbon impact</option><option>Fastest service recovery</option></select></label>
+            <label><span>Vehicle eligibility</span><select [(ngModel)]="vehicleType"><option>All eligible vehicles</option><option>Electric and CNG preferred</option><option>Cold-chain vehicles only</option><option>High-capacity fleet only</option></select></label>
+            <div class="constraint-list"><span><i>✓</i>Respect vehicle capacity</span><span><i>✓</i>Protect critical delivery priority</span><span><i>✓</i>Check cold-chain compatibility</span><span><i>✓</i>Keep human approval required</span></div>
+            <button type="button" class="optimize-button" [disabled]="routeOptimizationRunning" (click)="optimizeRoutes()">{{ routeOptimizationRunning ? 'Calculating…' : 'Recalculate route candidates' }}</button>
+            <small class="method-note">Prototype calculations use representative lanes. Production optimization requires live road, fleet and dispatch data.</small>
+          </div>
+        </aside>
+      </section>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>ROUTE DECISION QUEUE</span><h2>Ranked route candidates</h2><p>Compare baseline distance, capacity, cost, service priority and estimated carbon before approval.</p></div><span>{{ filteredRoutes().length }} routes</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Route</th><th>Lane / vehicle</th><th>Stops</th><th class="numeric">Distance</th><th>Utilization</th><th class="numeric">Cost</th><th>Carbon impact</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredRoutes()" [class.selected-row]="item.id === selectedRouteId" (click)="selectRoute(item)">
+            <td><strong>{{ item.id }} <em class="changed-marker" *ngIf="prototype.isChanged('routePlans', item.id)">Updated</em></strong><small><span [class]="'priority-dot ' + statusClass(item.priority)"></span>{{ item.priority }} service priority</small></td>
+            <td><strong>{{ item.lane }}</strong><small>{{ item.vehicle }}</small></td>
+            <td><strong>{{ item.stops.length }} planned stops</strong><small>Capacity-compatible sequence</small></td>
+            <td class="numeric"><strong>{{ item.optimizedKm }} km</strong><small>{{ item.baselineKm - item.optimizedKm }} km below baseline</small></td>
+            <td><strong>{{ item.loadKg / item.capacityKg | percent:'1.0-0' }}</strong><div class="mini-progress"><i [style.width.%]="item.loadKg / item.capacityKg * 100"></i></div></td>
+            <td class="numeric"><strong>{{ item.costInr | currency:'INR':'symbol':'1.0-0' }}</strong><small>estimated trip cost</small></td>
+            <td><strong class="positive-text">−{{ item.co2SavedKg }} kg CO₂e</strong><small>{{ item.co2Kg }} kg estimated trip total</small></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+            <td><button type="button" class="row-action" [disabled]="item.status === 'Delivered'" (click)="$event.stopPropagation(); advanceRoute(item)">{{ routeActionLabel(item) }}</button></td>
+          </tr><tr *ngIf="!filteredRoutes().length"><td colspan="9" class="empty-row">No routes match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'sustainability'">
+      <section class="metric-grid sustainability-metrics">
+        <article><span>Logistics emissions</span><strong>{{ totalEmissions() / 1000 | number:'1.2-2' }} tCO₂e</strong><small>Current reporting period estimate</small><i class="metric-icon indigo">CO₂</i></article>
+        <article><span>Emissions avoided</span><strong>{{ totalEmissionsAvoided() | number }} kg</strong><small>From consolidation and shorter routes</small><i class="metric-icon green">↓</i></article>
+        <article><span>Product waste avoided</span><strong>{{ totalWasteAvoided() / 1000 | number:'1.2-2' }} t</strong><small>Expiry-aware transfers and FEFO action</small><i class="metric-icon teal">♻</i></article>
+        <article><span>Carbon intensity</span><strong>{{ averageCarbonIntensity() | number:'1.3-3' }}</strong><small>kg CO₂e per vehicle-kilometre</small><i class="metric-icon blue">∿</i></article>
+      </section>
+
+      <section class="sustainability-grid">
+        <article class="panel emissions-trend-panel">
+          <div class="panel-heading"><div><span>EMISSIONS TREND</span><h2>Baseline versus optimized logistics</h2><p>Monthly estimates across transfer and delivery activity</p></div><span class="target-pill">18% reduction target</span></div>
+          <div class="trend-legend"><span><i class="baseline"></i>Baseline</span><span><i class="optimized"></i>Optimized</span></div>
+          <div class="emissions-chart" aria-label="Monthly baseline and optimized emissions chart">
+            <div><span><i class="baseline" style="height:78%"></i><i class="optimized" style="height:66%"></i></span><small>Mar</small></div>
+            <div><span><i class="baseline" style="height:84%"></i><i class="optimized" style="height:68%"></i></span><small>Apr</small></div>
+            <div><span><i class="baseline" style="height:76%"></i><i class="optimized" style="height:59%"></i></span><small>May</small></div>
+            <div><span><i class="baseline" style="height:88%"></i><i class="optimized" style="height:65%"></i></span><small>Jun</small></div>
+            <div><span><i class="baseline" style="height:82%"></i><i class="optimized" style="height:57%"></i></span><small>Jul</small></div>
+            <div class="current"><span><i class="baseline" style="height:75%"></i><i class="optimized" style="height:51%"></i></span><small>Aug</small></div>
+          </div>
+          <div class="chart-axis"><span>0</span><span>1 t</span><span>2 t</span><span>3 tCO₂e</span></div>
+        </article>
+
+        <article class="panel impact-breakdown-panel">
+          <div class="panel-heading"><div><span>AVOIDED IMPACT</span><h2>Where savings come from</h2></div><span>1.02 tCO₂e</span></div>
+          <div class="impact-breakdown-body">
+            <div class="impact-donut"><div><strong>1.02</strong><small>tCO₂e avoided</small></div></div>
+            <div class="impact-legend"><span><i class="route"></i><b>Route consolidation</b><strong>46%</strong></span><span><i class="transfer"></i><b>Stock transfers</b><strong>31%</strong></span><span><i class="vehicle"></i><b>Vehicle selection</b><strong>15%</strong></span><span><i class="waste"></i><b>Waste prevention</b><strong>8%</strong></span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="methodology-strip">
+        <div><i>ƒ</i><span><strong>Transparent estimation</strong><small>Trip CO₂e = optimized distance × vehicle emission factor. Avoided CO₂e = baseline estimate − optimized estimate.</small></span></div>
+        <div><i>✓</i><span><strong>Evidence retained</strong><small>Route, vehicle class, distance, factor version and approval status should be stored with every calculation.</small></span></div>
+        <div><i>!</i><span><strong>Estimate, not certification</strong><small>Values require verified fleet and fuel data before use in audited sustainability reporting.</small></span></div>
+      </section>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>LOCATION PERFORMANCE</span><h2>Warehouse sustainability scorecard</h2><p>Operational emissions and avoided product waste by fulfilment node.</p></div><span>{{ filteredSustainability().length }} locations</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Location</th><th class="numeric">Trips</th><th class="numeric">Distance</th><th class="numeric">Emissions</th><th class="numeric">Avoided</th><th class="numeric">Waste avoided</th><th>Carbon intensity</th><th>Performance</th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredSustainability()">
+            <td><strong>{{ item.location }} <em class="changed-marker" *ngIf="prototype.isChanged('sustainability', item.location)">Updated</em></strong><small>{{ item.state }}</small></td>
+            <td class="numeric"><strong>{{ item.trips }}</strong><small>completed trips</small></td>
+            <td class="numeric"><strong>{{ item.distanceKm | number }} km</strong><small>optimized network distance</small></td>
+            <td class="numeric"><strong>{{ item.emissionsKg | number }} kg CO₂e</strong><small>estimated total</small></td>
+            <td class="numeric"><strong class="positive-text">−{{ item.emissionsAvoidedKg }} kg</strong><small>against baseline</small></td>
+            <td class="numeric"><strong>{{ item.wasteAvoidedKg }} kg</strong><small>expiry and damage prevention</small></td>
+            <td><strong>{{ item.intensity | number:'1.3-3' }} kg/km</strong><div class="mini-progress carbon-progress"><i [style.width.%]="item.intensity / 0.30 * 100"></i></div></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+          </tr><tr *ngIf="!filteredSustainability().length"><td colspan="8" class="empty-row">No sustainability records match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'purchase'">
+      <section class="metric-grid">
+        <article><span>Planned spend</span><strong>{{ purchasePlanValue() | currency:'INR':'symbol':'1.0-0' }}</strong><small>Across {{ purchasePlans.length }} live recommendations</small><i class="metric-icon indigo">₹</i></article>
+        <article><span>Critical lines</span><strong>{{ criticalPurchaseCount() }}</strong><small>Need action within supplier lead time</small><i class="metric-icon red">!</i></article>
+        <article><span>Average confidence</span><strong>{{ averagePurchaseConfidence() | number:'1.0-1' }}%</strong><small>Forecast or recent-sales backed</small><i class="metric-icon green">⌁</i></article>
+        <article><span>Open purchase units</span><strong>{{ (replenishmentSummary?.openPurchaseQuantity || 0) | number }}</strong><small>Deducted before recommendations</small><i class="metric-icon teal">◇</i></article>
+      </section>
+
+      <section class="insight-grid purchase-insights">
+        <article class="panel spend-panel">
+          <div class="panel-heading"><div><span>SPEND PHASING</span><h2>Recommended commitment window</h2></div><span class="optimization-badge">Next 14 days</span></div>
+          <div class="spend-bars"><div><span>Today</span><i><b style="height:42%"></b></i><strong>₹2.97L</strong></div><div><span>Week 1</span><i><b style="height:78%"></b></i><strong>₹46.7K</strong></div><div><span>Week 2</span><i><b style="height:58%"></b></i><strong>₹28.5K</strong></div><div><span>Deferred</span><i><b style="height:24%"></b></i><strong>₹12.3K</strong></div></div>
+        </article>
+        <article class="panel supplier-panel">
+          <div class="panel-heading"><div><span>SUPPLIER HEALTH</span><h2>Coverage and reliability</h2></div><span>4 active</span></div>
+          <div class="supplier-list"><div><i class="supplier-avatar">MA</i><span><strong>MedAxis Biologics</strong><small>98% OTIF · Cold chain</small></span><em>Preferred</em></div><div><i class="supplier-avatar">NC</i><span><strong>NovaCure Labs</strong><small>94% OTIF · 6 day lead</small></span><em>Stable</em></div><div><i class="supplier-avatar">AR</i><span><strong>Apex Remedies</strong><small>91% OTIF · Best cost</small></span><em>Review</em></div></div>
+        </article>
+      </section>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>PLANNING QUEUE</span><h2>Purchase recommendations</h2><p>Live quantities respect demand, lead time, safety stock, open proposals and reorder multiples.</p></div><span>{{ replenishmentLoading ? 'Calculating…' : filteredPurchasePlans().length + ' records' }}</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Plan</th><th>Product</th><th>Supplier</th><th class="numeric">Recommended qty</th><th class="numeric">Plan value</th><th>Need / cover</th><th>Confidence</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredPurchasePlans()">
+            <td><strong>{{ item.id }} <em class="changed-marker" *ngIf="prototype.isChanged('purchasePlans', item.id)">Updated</em></strong><small><span [class]="'priority-dot ' + statusClass(item.risk)"></span>{{ item.risk }} risk</small></td>
+            <td><strong>{{ item.product }}</strong><small>{{ item.sku }} · {{ item.warehouseName }}</small></td>
+            <td><strong>{{ item.supplier }}</strong><small>{{ item.leadTimeDays }} day lead time</small></td>
+            <td class="numeric"><strong>{{ item.quantity | number }}</strong><small>units</small></td>
+            <td class="numeric"><strong>{{ item.quantity * item.unitCost | currency:'INR':'symbol':'1.0-0' }}</strong><small>{{ item.unitCost | currency:'INR':'symbol':'1.2-2' }} / unit</small></td>
+            <td><strong>{{ item.needBy }}</strong><small>{{ item.coverDays }} days cover remaining</small></td>
+            <td><strong>{{ item.confidence }}%</strong><div class="mini-progress"><i [style.width.%]="item.confidence"></i></div></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+            <td><button type="button" class="row-action" [disabled]="item.quantity === 0 || item.status === 'APPROVED'" (click)="approvePurchase(item)">{{ item.quantity === 0 ? 'Already covered' : 'Review plan' }}</button></td>
+          </tr><tr *ngIf="!filteredPurchasePlans().length"><td colspan="9" class="empty-row">No purchase plans match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'orders'">
+      <section class="metric-grid">
+        <article><span>Open orders</span><strong>{{ orders.length }}</strong><small>{{ orderCount('On hold') }} requires attention</small><i class="metric-icon indigo">▤</i></article>
+        <article><span>Order value</span><strong>{{ orderValue() | currency:'INR':'symbol':'1.0-0' }}</strong><small>Current operational queue</small><i class="metric-icon blue">₹</i></article>
+        <article><span>Average fulfilment</span><strong>{{ averageFulfillment() | number:'1.0-0' }}%</strong><small>Allocated line quantity</small><i class="metric-icon green">✓</i></article>
+        <article><span>On-time promise</span><strong>96.4%</strong><small>Trailing 30-day OTIF</small><i class="metric-icon teal">◷</i></article>
+      </section>
+
+      <article class="panel fulfilment-board">
+        <div class="panel-heading"><div><span>LIVE FLOW</span><h2>Fulfilment pipeline</h2></div><span>Last synchronized 2 min ago</span></div>
+        <div class="stage-grid"><div><i>01</i><span><strong>{{ orderCount('Allocated') }}</strong><small>Allocated</small></span><em>Inventory secured</em></div><div><i>02</i><span><strong>{{ orderCount('Picking') }}</strong><small>Picking</small></span><em>Warehouse execution</em></div><div><i>03</i><span><strong>{{ orderCount('Ready to ship') }}</strong><small>Ready</small></span><em>Dispatch queue</em></div><div><i>04</i><span><strong>{{ orderCount('Shipped') }}</strong><small>Shipped</small></span><em>Carrier handoff</em></div></div>
+      </article>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>ORDER QUEUE</span><h2>Customer orders</h2><p>Promise-date, allocation and fulfilment visibility across every active warehouse.</p></div><span>{{ filteredOrders().length }} records</span></div>
+        <p class="proposal-error" *ngIf="orderError && !orderDialogOpen">{{ orderError }}</p>
+        <p class="empty-row" *ngIf="ordersLoading">Loading live customer orders…</p>
+        <div class="table-scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Fulfilment node</th><th class="numeric">Items</th><th class="numeric">Value</th><th>Promised</th><th>Fulfilment</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredOrders()">
+            <td><strong>{{ item.id }} <em class="changed-marker" *ngIf="prototype.isChanged('orders', item.id)">Updated</em></strong><small>{{ item.channel }}</small></td>
+            <td><strong>{{ item.customer }}</strong><small>{{ item.city }}</small></td>
+            <td><strong>{{ item.warehouse }}</strong><small>Inventory allocation node</small></td>
+            <td class="numeric"><strong>{{ item.quantity || item.itemCount }}</strong><small>{{ item.skuName || 'order lines' }}</small></td>
+            <td class="numeric"><strong>{{ item.value | currency:'INR':'symbol':'1.0-0' }}</strong><small>net order value</small></td>
+            <td><strong>{{ item.promisedDate }}</strong><small>Customer commitment</small></td>
+            <td><strong>{{ item.fulfillment }}%</strong><div class="mini-progress"><i [style.width.%]="item.fulfillment" [class.warning]="item.fulfillment < 70"></i></div></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+            <td><button type="button" class="row-action" [disabled]="item.status === 'Shipped' || item.status === 'Cancelled' || orderActionId === item.orderId" (click)="advanceOrder(item)">{{ orderActionId === item.orderId ? 'Saving…' : item.status === 'Shipped' ? 'Completed' : 'Advance' }}</button></td>
+          </tr><tr *ngIf="!filteredOrders().length"><td colspan="9" class="empty-row">No orders match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'returns'">
+      <section class="metric-grid">
+        <article><span>Open returns</span><strong>3</strong><small>1 requires quality review</small><i class="metric-icon indigo">↶</i></article>
+        <article><span>Value at risk</span><strong>{{ returnValue() | currency:'INR':'symbol':'1.0-0' }}</strong><small>Across active cases</small><i class="metric-icon red">₹</i></article>
+        <article><span>Recovered value</span><strong>72%</strong><small>Returned to stock or claimed</small><i class="metric-icon green">♻</i></article>
+        <article><span>Cycle time</span><strong>1.8 days</strong><small>12% faster than last month</small><i class="metric-icon teal">◷</i></article>
+      </section>
+
+      <section class="insight-grid return-insights">
+        <article class="panel disposition-panel"><div class="panel-heading"><div><span>VALUE RECOVERY</span><h2>Disposition mix</h2></div><span>Last 30 days</span></div><div class="donut-small"><div><strong>72%</strong><small>Recovered</small></div></div><div class="disposition-legend"><span><i class="green"></i>Return to stock <strong>42%</strong></span><span><i class="blue"></i>Supplier claim <strong>30%</strong></span><span><i class="orange"></i>Inspection <strong>18%</strong></span><span><i class="red"></i>Write-off <strong>10%</strong></span></div></article>
+        <article class="panel quality-panel"><div class="panel-heading"><div><span>QUALITY SIGNALS</span><h2>Top return reasons</h2></div><span>24 cases</span></div><div class="reason-list"><div><span>Transit damage</span><i><b style="width:78%"></b></i><strong>9</strong></div><div><span>Short-dated stock</span><i><b style="width:52%"></b></i><strong>6</strong></div><div><span>Cold-chain excursion</span><i><b style="width:35%"></b></i><strong>4</strong></div><div><span>Order entry error</span><i><b style="width:26%"></b></i><strong>3</strong></div></div></article>
+      </section>
+
+      <article class="panel table-panel">
+        <div class="panel-heading"><div><span>RETURN QUEUE</span><h2>Return cases</h2><p>Quality, financial and disposition evidence in one review queue.</p></div><span>{{ filteredReturns().length }} records</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Return</th><th>Customer / order</th><th>Product</th><th class="numeric">Quantity</th><th>Reason</th><th>Disposition</th><th class="numeric">Value</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr *ngFor="let item of filteredReturns()">
+            <td><strong>{{ item.id }} <em class="changed-marker" *ngIf="prototype.isChanged('returns', item.id)">Updated</em></strong><small>{{ item.receivedDate }} · {{ item.warehouse }}</small></td>
+            <td><strong>{{ item.customer }}</strong><small>{{ item.orderId }}</small></td>
+            <td><strong>{{ item.product }}</strong><small>Returned inventory line</small></td>
+            <td class="numeric"><strong>{{ item.quantity | number }}</strong><small>units</small></td>
+            <td><strong>{{ item.reason }}</strong><small>Reported by customer</small></td>
+            <td><strong>{{ item.disposition }}</strong><small>Recommended next step</small></td>
+            <td class="numeric"><strong>{{ item.value | currency:'INR':'symbol':'1.0-0' }}</strong><small>recoverable value</small></td>
+            <td><span [class]="'status-pill ' + statusClass(item.status)">{{ item.status }}</span></td>
+            <td><button type="button" class="row-action" [disabled]="item.status === 'Closed'" (click)="approveReturn(item)">{{ item.status === 'Closed' ? 'View case' : 'Review case' }}</button></td>
+          </tr><tr *ngIf="!filteredReturns().length"><td colspan="9" class="empty-row">No returns match the current filters.</td></tr>
+        </tbody></table></div>
+      </article>
+    </ng-container>
+  </ng-container>
+
+  <div class="operation-toast" *ngIf="toastMessage" role="status" aria-live="polite">✓ {{ toastMessage }}</div>
+</section>

@@ -1,0 +1,82 @@
+<main class="auth-page">
+  <section class="auth-story" aria-label="StockFlow AI overview">
+    <div class="brand-lockup">
+      <span class="brand-mark"><i></i><i></i><i></i></span>
+      <span><strong>StockFlow AI</strong><small>Intelligent Inventory Network</small></span>
+    </div>
+
+    <div class="story-copy">
+      <span class="eyebrow">Inventory intelligence that moves</span>
+      <h1>Predict risk.<br>Rebalance stock.<br>Reduce waste.</h1>
+      <p>One operational workspace for demand forecasting, inventory decisions and measurable supply-chain impact.</p>
+    </div>
+
+    <div class="story-proof">
+      <div><strong>148</strong><span>positions validated</span></div>
+      <div><strong>0</strong><span>forecast failures</span></div>
+      <div><strong>48.67%</strong><span>validated WAPE</span></div>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card" *ngIf="auth.configured; else setupRequired">
+      <header>
+        <span class="eyebrow">SECURE WORKSPACE</span>
+        <h2>{{ title() }}</h2>
+        <p>{{ description() }}</p>
+      </header>
+
+      <form (ngSubmit)="submit()" novalidate>
+        <label *ngIf="mode === 'signUp'">
+          <span>Full name</span>
+          <input name="fullName" [(ngModel)]="fullName" autocomplete="name" placeholder="Your name" [disabled]="submitting">
+        </label>
+        <label *ngIf="mode !== 'updatePassword'">
+          <span>Work email</span>
+          <input name="email" type="email" [(ngModel)]="email" autocomplete="email" placeholder="you@company.com" required [disabled]="submitting">
+        </label>
+        <label *ngIf="mode !== 'forgotPassword'">
+          <span>{{ mode === 'updatePassword' ? 'New password' : 'Password' }}</span>
+          <input name="password" type="password" [(ngModel)]="password" [autocomplete]="mode === 'signIn' ? 'current-password' : 'new-password'" placeholder="At least 8 characters" minlength="8" [disabled]="submitting">
+        </label>
+        <label *ngIf="mode === 'updatePassword'">
+          <span>Confirm new password</span>
+          <input name="confirmPassword" type="password" [(ngModel)]="confirmPassword" autocomplete="new-password" placeholder="Enter it again" minlength="8" [disabled]="submitting">
+        </label>
+
+        <div class="form-tools" *ngIf="mode === 'signIn'">
+          <button type="button" class="text-button" (click)="setMode('forgotPassword')">Forgot password?</button>
+        </div>
+
+        <p class="form-error" *ngIf="error" role="alert">{{ error }}</p>
+        <p class="form-message" *ngIf="message" role="status">{{ message }}</p>
+
+        <button class="submit-button" type="submit" [disabled]="submitting">
+          <span *ngIf="submitting" class="button-spinner"></span>
+          {{ submitting ? 'Please wait…' : submitLabel() }}
+        </button>
+      </form>
+
+      <footer *ngIf="mode === 'signIn' || mode === 'signUp'">
+        <span>{{ mode === 'signIn' ? 'New to StockFlow?' : 'Already have an account?' }}</span>
+        <button type="button" (click)="setMode(mode === 'signIn' ? 'signUp' : 'signIn')">
+          {{ mode === 'signIn' ? 'Create an account' : 'Sign in instead' }}
+        </button>
+      </footer>
+      <footer *ngIf="mode === 'forgotPassword'">
+        <button type="button" (click)="setMode('signIn')">← Back to sign in</button>
+      </footer>
+    </div>
+
+    <ng-template #setupRequired>
+      <div class="auth-card setup-card">
+        <span class="setup-icon">⚙</span>
+        <span class="eyebrow">ONE-TIME SETUP</span>
+        <h2>Connect your Supabase project</h2>
+        <p>Add the project URL and browser-safe publishable key to:</p>
+        <code>src/assets/config/runtime-config.js</code>
+        <p class="setup-note">Never place a Supabase secret or service-role key in frontend code.</p>
+      </div>
+    </ng-template>
+  </section>
+</main>

@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: ${STOCKFLOW_DB_URL:jdbc:postgresql://localhost:5432/stockflow}
+    username: ${STOCKFLOW_DB_USERNAME:stockflow_app}
+    password: ${STOCKFLOW_DB_PASSWORD:stockflow_dev}
+    hikari:
+      maximum-pool-size: ${STOCKFLOW_DB_POOL_SIZE:10}
+      minimum-idle: 1
+      connection-timeout: 5000
+      validation-timeout: 3000
+  flyway:
+    locations: classpath:db/migration,classpath:db/devdata
+
+logging:
+  level:
+    org.flywaydb: INFO
+    org.hibernate.SQL: INFO

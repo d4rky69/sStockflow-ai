@@ -1,0 +1,26 @@
+dataset:
+  name: stockflow-sih-demo-v1
+  version: 1.0.0
+  random_seed: 20260726
+  currency: INR
+  timezone: Asia/Kolkata
+  history_start_date: 2026-01-01
+  history_end_date: 2026-07-25
+  forecast_as_of_date: 2026-07-26
+scale:
+  tenants: 3
+  warehouses: 10
+  retailers: 50
+  skus: 100
+vertical_distribution:
+  PHARMA: 40
+  SUPERMARKET: 35
+  MERCHANDISE: 25
+sales:
+  random_noise_stddev: 0.12
+inventory:
+  healthy_days_of_cover_min: 15
+  healthy_days_of_cover_max: 45
+expiry:
+  near_expiry_percentage: 0.08
+  expired_percentage: 0.02

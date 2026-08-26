@@ -1,0 +1,17 @@
+{
+  "package": "StockFlow_AI_Frontend_Increment3_Predictive_Forecasting",
+  "increment": "Frontend Increment 3",
+  "backend_dependency": "Phase 3 Increment 5A",
+  "typescript_strict_stub_validation": "PASS",
+  "css_brace_validation": "PASS",
+  "html_structural_validation": "PASS",
+  "angular_build": "TO_BE_RUN_ON_PROJECT_MACHINE",
+  "reason_angular_build_not_run": "Angular 21.2 packages were not available in the packaging registry.",
+  "forecast_endpoints": [
+    "POST /api/v1/forecasts/runs",
+    "GET /api/v1/forecasts/runs",
+    "GET /api/v1/forecasts/latest",
+    "GET /api/v1/forecasts/summary",
+    "GET /api/v1/forecasts/model-performance"
+  ]
+}
