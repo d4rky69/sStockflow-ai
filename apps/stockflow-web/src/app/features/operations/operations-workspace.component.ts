@@ -202,10 +202,10 @@ export class OperationsWorkspaceComponent implements OnChanges, OnDestroy, OnIni
   private toastTimer?: number;
 
   transfers: TransferPlan[] = [
-    { id: 'TRF-2048', sku: 'SKU-PARA-650', product: 'Paracetamol 650 mg', from: 'Chennai Central', to: 'Bengaluru North', quantity: 840, priority: 'Critical', status: 'Awaiting approval', distanceKm: 347, eta: 'Today, 18:30', reason: 'Stockout projected in 2.1 days', co2SavedKg: 18.4, serviceLift: 12 },
-    { id: 'TRF-2047', sku: 'SKU-AMOX-500', product: 'Amoxicillin 500 mg', from: 'Hyderabad Hub', to: 'Chennai Central', quantity: 460, priority: 'High', status: 'Approved', distanceKm: 628, eta: 'Tomorrow, 09:00', reason: 'Safety stock breach at destination', co2SavedKg: 11.2, serviceLift: 8 },
-    { id: 'TRF-2046', sku: 'SKU-ORS-21', product: 'ORS Sachet 21 g', from: 'Bengaluru North', to: 'Mysuru DC', quantity: 1200, priority: 'Medium', status: 'In transit', distanceKm: 148, eta: 'Today, 15:45', reason: 'Demand surge after regional campaign', co2SavedKg: 22.8, serviceLift: 6 },
-    { id: 'TRF-2045', sku: 'SKU-CET-10', product: 'Cetirizine 10 mg', from: 'Chennai Central', to: 'Coimbatore West', quantity: 320, priority: 'Medium', status: 'Delivered', distanceKm: 505, eta: 'Delivered 10:24', reason: 'Balanced excess inventory', co2SavedKg: 8.6, serviceLift: 4 }
+    { id: 'TRF-2048', sku: 'SKU-PARA-650', product: 'Paracetamol 650 mg', from: 'Guwahati Central', to: 'Shillong Hub', quantity: 840, priority: 'Critical', status: 'Awaiting approval', distanceKm: 102, eta: 'Today, 18:30', reason: 'Stockout projected in 2.1 days', co2SavedKg: 18.4, serviceLift: 12 },
+    { id: 'TRF-2047', sku: 'SKU-AMOX-500', product: 'Amoxicillin 500 mg', from: 'Imphal Hub', to: 'Guwahati Central', quantity: 460, priority: 'High', status: 'Approved', distanceKm: 485, eta: 'Tomorrow, 09:00', reason: 'Safety stock breach at destination', co2SavedKg: 11.2, serviceLift: 8 },
+    { id: 'TRF-2046', sku: 'SKU-ORS-21', product: 'ORS Sachet 21 g', from: 'Shillong Hub', to: 'Dimapur DC', quantity: 1200, priority: 'Medium', status: 'In transit', distanceKm: 335, eta: 'Today, 15:45', reason: 'Demand surge after regional campaign', co2SavedKg: 22.8, serviceLift: 6 },
+    { id: 'TRF-2045', sku: 'SKU-CET-10', product: 'Cetirizine 10 mg', from: 'Guwahati Central', to: 'Agartala West', quantity: 320, priority: 'Medium', status: 'Delivered', distanceKm: 599, eta: 'Delivered 10:24', reason: 'Balanced excess inventory', co2SavedKg: 8.6, serviceLift: 4 }
   ];
 
   purchasePlans: PurchasePlan[] = [
@@ -216,33 +216,33 @@ export class OperationsWorkspaceComponent implements OnChanges, OnDestroy, OnIni
   ];
 
   orders: CustomerOrder[] = [
-    { id: 'SO-10842', customer: 'Lotus Care Pharmacy', city: 'Chennai', channel: 'B2B Portal', warehouse: 'Chennai Central', itemCount: 14, value: 68420, promisedDate: 'Today, 16:00', fulfillment: 100, status: 'Ready to ship' },
-    { id: 'SO-10841', customer: 'GreenCross Medicals', city: 'Bengaluru', channel: 'EDI', warehouse: 'Bengaluru North', itemCount: 8, value: 42180, promisedDate: 'Today, 18:30', fulfillment: 86, status: 'Picking' },
-    { id: 'SO-10840', customer: 'City Health Mart', city: 'Hyderabad', channel: 'Sales desk', warehouse: 'Hyderabad Hub', itemCount: 22, value: 116750, promisedDate: 'Tomorrow, 10:00', fulfillment: 64, status: 'Allocated' },
-    { id: 'SO-10839', customer: 'MediPoint Stores', city: 'Coimbatore', channel: 'B2B Portal', warehouse: 'Coimbatore West', itemCount: 6, value: 27990, promisedDate: '08 Aug 2026', fulfillment: 100, status: 'Shipped' },
-    { id: 'SO-10838', customer: 'Aarogya Distributors', city: 'Mysuru', channel: 'EDI', warehouse: 'Mysuru DC', itemCount: 11, value: 53760, promisedDate: '08 Aug 2026', fulfillment: 38, status: 'On hold' }
+    { id: 'SO-10842', customer: 'Lotus Care Pharmacy', city: 'Guwahati', channel: 'B2B Portal', warehouse: 'Guwahati Central', itemCount: 14, value: 68420, promisedDate: 'Today, 16:00', fulfillment: 100, status: 'Ready to ship' },
+    { id: 'SO-10841', customer: 'GreenCross Medicals', city: 'Shillong', channel: 'EDI', warehouse: 'Shillong Hub', itemCount: 8, value: 42180, promisedDate: 'Today, 18:30', fulfillment: 86, status: 'Picking' },
+    { id: 'SO-10840', customer: 'City Health Mart', city: 'Imphal', channel: 'Sales desk', warehouse: 'Imphal Hub', itemCount: 22, value: 116750, promisedDate: 'Tomorrow, 10:00', fulfillment: 64, status: 'Allocated' },
+    { id: 'SO-10839', customer: 'MediPoint Stores', city: 'Agartala', channel: 'B2B Portal', warehouse: 'Agartala West', itemCount: 6, value: 27990, promisedDate: '08 Aug 2026', fulfillment: 100, status: 'Shipped' },
+    { id: 'SO-10838', customer: 'Aarogya Distributors', city: 'Dimapur', channel: 'EDI', warehouse: 'Dimapur DC', itemCount: 11, value: 53760, promisedDate: '08 Aug 2026', fulfillment: 38, status: 'On hold' }
   ];
 
   returns: ReturnCase[] = [
-    { id: 'RET-3621', orderId: 'SO-10791', customer: 'Lotus Care Pharmacy', product: 'Insulin Glargine', quantity: 12, reason: 'Cold-chain excursion', disposition: 'Quality inspection', value: 8856, receivedDate: 'Today, 09:42', warehouse: 'Chennai Central', status: 'Needs review' },
-    { id: 'RET-3620', orderId: 'SO-10768', customer: 'MediPoint Stores', product: 'Paracetamol 650 mg', quantity: 80, reason: 'Transit damage', disposition: 'Supplier claim', value: 3120, receivedDate: 'Yesterday', warehouse: 'Coimbatore West', status: 'Approved' },
-    { id: 'RET-3619', orderId: 'SO-10744', customer: 'GreenCross Medicals', product: 'Cetirizine 10 mg', quantity: 44, reason: 'Short-dated stock', disposition: 'FEFO reallocation', value: 2464, receivedDate: '04 Aug 2026', warehouse: 'Bengaluru North', status: 'Processing' },
-    { id: 'RET-3618', orderId: 'SO-10712', customer: 'City Health Mart', product: 'ORS Sachet 21 g', quantity: 120, reason: 'Order entry error', disposition: 'Return to stock', value: 1044, receivedDate: '03 Aug 2026', warehouse: 'Hyderabad Hub', status: 'Closed' }
+    { id: 'RET-3621', orderId: 'SO-10791', customer: 'Lotus Care Pharmacy', product: 'Insulin Glargine', quantity: 12, reason: 'Cold-chain excursion', disposition: 'Quality inspection', value: 8856, receivedDate: 'Today, 09:42', warehouse: 'Guwahati Central', status: 'Needs review' },
+    { id: 'RET-3620', orderId: 'SO-10768', customer: 'MediPoint Stores', product: 'Paracetamol 650 mg', quantity: 80, reason: 'Transit damage', disposition: 'Supplier claim', value: 3120, receivedDate: 'Yesterday', warehouse: 'Agartala West', status: 'Approved' },
+    { id: 'RET-3619', orderId: 'SO-10744', customer: 'GreenCross Medicals', product: 'Cetirizine 10 mg', quantity: 44, reason: 'Short-dated stock', disposition: 'FEFO reallocation', value: 2464, receivedDate: '04 Aug 2026', warehouse: 'Shillong Hub', status: 'Processing' },
+    { id: 'RET-3618', orderId: 'SO-10712', customer: 'City Health Mart', product: 'ORS Sachet 21 g', quantity: 120, reason: 'Order entry error', disposition: 'Return to stock', value: 1044, receivedDate: '03 Aug 2026', warehouse: 'Imphal Hub', status: 'Closed' }
   ];
 
   routePlans: RoutePlan[] = [
-    { id: 'RTE-301', lane: 'Chennai → Bengaluru → Mysuru', stops: ['Chennai Central', 'Bengaluru North', 'Mysuru DC'], vehicle: '12T electric-assisted truck', loadKg: 10860, capacityKg: 12000, baselineKm: 612, optimizedKm: 495, duration: '8h 35m', costInr: 28400, co2Kg: 86.2, co2SavedKg: 31.8, priority: 'Critical', status: 'Ready for approval' },
-    { id: 'RTE-302', lane: 'Hyderabad → Chennai', stops: ['Hyderabad Hub', 'Nellore Cross-dock', 'Chennai Central'], vehicle: '16T diesel BS-VI truck', loadKg: 13120, capacityKg: 16000, baselineKm: 664, optimizedKm: 628, duration: '10h 20m', costInr: 36150, co2Kg: 142.6, co2SavedKg: 12.4, priority: 'High', status: 'Optimized' },
-    { id: 'RTE-303', lane: 'Chennai → Coimbatore', stops: ['Chennai Central', 'Salem Hub', 'Coimbatore West'], vehicle: '9T CNG truck', loadKg: 7960, capacityKg: 9000, baselineKm: 548, optimizedKm: 505, duration: '8h 05m', costInr: 23800, co2Kg: 73.4, co2SavedKg: 16.7, priority: 'High', status: 'Approved' },
-    { id: 'RTE-304', lane: 'Bengaluru → Mysuru', stops: ['Bengaluru North', 'Mandya Drop', 'Mysuru DC'], vehicle: '6T electric truck', loadKg: 5160, capacityKg: 6000, baselineKm: 171, optimizedKm: 148, duration: '3h 10m', costInr: 9400, co2Kg: 18.8, co2SavedKg: 14.2, priority: 'Medium', status: 'In transit' }
+    { id: 'RTE-301', lane: 'Guwahati → Shillong → Dimapur', stops: ['Guwahati Central', 'Shillong Hub', 'Dimapur DC'], vehicle: '12T electric-assisted truck', loadKg: 10860, capacityKg: 12000, baselineKm: 440, optimizedKm: 382, duration: '8h 35m', costInr: 28400, co2Kg: 86.2, co2SavedKg: 31.8, priority: 'Critical', status: 'Ready for approval' },
+    { id: 'RTE-302', lane: 'Imphal → Guwahati', stops: ['Imphal Hub', 'Nagaon Cross-dock', 'Guwahati Central'], vehicle: '16T diesel BS-VI truck', loadKg: 13120, capacityKg: 16000, baselineKm: 520, optimizedKm: 485, duration: '10h 20m', costInr: 36150, co2Kg: 142.6, co2SavedKg: 12.4, priority: 'High', status: 'Optimized' },
+    { id: 'RTE-303', lane: 'Guwahati → Agartala', stops: ['Guwahati Central', 'Silchar Hub', 'Agartala West'], vehicle: '9T CNG truck', loadKg: 7960, capacityKg: 9000, baselineKm: 620, optimizedKm: 599, duration: '12h 05m', costInr: 23800, co2Kg: 73.4, co2SavedKg: 16.7, priority: 'High', status: 'Approved' },
+    { id: 'RTE-304', lane: 'Shillong → Dimapur', stops: ['Shillong Hub', 'Jowai Drop', 'Dimapur DC'], vehicle: '6T electric truck', loadKg: 5160, capacityKg: 6000, baselineKm: 360, optimizedKm: 335, duration: '6h 10m', costInr: 9400, co2Kg: 18.8, co2SavedKg: 14.2, priority: 'Medium', status: 'In transit' }
   ];
 
   sustainabilityRecords: SustainabilityRecord[] = [
-    { location: 'Chennai Central', state: 'Tamil Nadu', trips: 42, distanceKm: 8240, emissionsKg: 1840, emissionsAvoidedKg: 318, wasteAvoidedKg: 462, intensity: 0.223, status: 'On target' },
-    { location: 'Bengaluru North', state: 'Karnataka', trips: 36, distanceKm: 6910, emissionsKg: 1395, emissionsAvoidedKg: 284, wasteAvoidedKg: 386, intensity: 0.202, status: 'On target' },
-    { location: 'Hyderabad Hub', state: 'Telangana', trips: 31, distanceKm: 7550, emissionsKg: 1928, emissionsAvoidedKg: 172, wasteAvoidedKg: 318, intensity: 0.255, status: 'Needs attention' },
-    { location: 'Coimbatore West', state: 'Tamil Nadu', trips: 24, distanceKm: 3860, emissionsKg: 792, emissionsAvoidedKg: 146, wasteAvoidedKg: 274, intensity: 0.205, status: 'On target' },
-    { location: 'Mysuru DC', state: 'Karnataka', trips: 19, distanceKm: 2140, emissionsKg: 438, emissionsAvoidedKg: 96, wasteAvoidedKg: 181, intensity: 0.205, status: 'Improving' }
+    { location: 'Guwahati Central', state: 'Assam', trips: 42, distanceKm: 8240, emissionsKg: 1840, emissionsAvoidedKg: 318, wasteAvoidedKg: 462, intensity: 0.223, status: 'On target' },
+    { location: 'Shillong Hub', state: 'Meghalaya', trips: 36, distanceKm: 6910, emissionsKg: 1395, emissionsAvoidedKg: 284, wasteAvoidedKg: 386, intensity: 0.202, status: 'On target' },
+    { location: 'Imphal Hub', state: 'Manipur', trips: 31, distanceKm: 7550, emissionsKg: 1928, emissionsAvoidedKg: 172, wasteAvoidedKg: 318, intensity: 0.255, status: 'Needs attention' },
+    { location: 'Agartala West', state: 'Tripura', trips: 24, distanceKm: 3860, emissionsKg: 792, emissionsAvoidedKg: 146, wasteAvoidedKg: 274, intensity: 0.205, status: 'On target' },
+    { location: 'Dimapur DC', state: 'Nagaland', trips: 19, distanceKm: 2140, emissionsKg: 438, emissionsAvoidedKg: 96, wasteAvoidedKg: 181, intensity: 0.205, status: 'Improving' }
   ];
 
   ngOnInit(): void {
@@ -706,7 +706,7 @@ export class OperationsWorkspaceComponent implements OnChanges, OnDestroy, OnIni
   openPurchaseProposal(item: PurchasePlan): void {
     this.proposalForm = {
       ...this.emptyProposal('PURCHASE'), skuId: item.sku, quantity: item.quantity,
-      destinationWarehouseId: item.warehouseId ?? 'WH-CHENNAI', supplierReference: item.supplier, unitCost: item.unitCost,
+      destinationWarehouseId: item.warehouseId ?? 'WH-GUWAHATI', supplierReference: item.supplier, unitCost: item.unitCost,
       reason: `${item.risk} stock risk with ${item.coverDays} days of cover remaining.`,
       recommendationEvidence: `${item.id}; ${item.explanation ?? `forecast confidence ${item.confidence}%; need by ${item.needBy}; lead time ${item.leadTimeDays} days.`}`
     };
@@ -929,7 +929,7 @@ export class OperationsWorkspaceComponent implements OnChanges, OnDestroy, OnIni
   }
 
   private warehouseId(label: string): string {
-    const ids: Record<string, string> = { 'Chennai Central': 'WH-CHENNAI', 'Bengaluru North': 'WH-BENGALURU', 'Hyderabad Hub': 'WH-HYDERABAD', 'Mysuru DC': 'WH-MYSURU', 'Coimbatore West': 'WH-COIMBATORE' };
+    const ids: Record<string, string> = { 'Guwahati Central': 'WH-GUWAHATI', 'Shillong Hub': 'WH-SHILLONG', 'Imphal Hub': 'WH-IMPHAL', 'Dimapur DC': 'WH-DIMAPUR', 'Agartala West': 'WH-AGARTALA' };
     return ids[label] ?? label;
   }
 

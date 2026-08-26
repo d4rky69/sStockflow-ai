@@ -97,7 +97,7 @@
       "id": "R-001",
       "product": "Paracetamol 650mg Tablet",
       "batch": "B2456",
-      "warehouse": "Chennai WH",
+      "warehouse": "Guwahati WH",
       "type": "Near Expiry",
       "badgeClass": "expiry",
       "quantity": "2,450 Units",
@@ -109,7 +109,7 @@
     {
       "id": "R-002",
       "product": "Amoxicillin 500mg Capsule",
-      "warehouse": "Bengaluru WH",
+      "warehouse": "Shillong WH",
       "type": "Stockout Risk",
       "badgeClass": "stockout",
       "quantity": "1,200 Units",
@@ -121,7 +121,7 @@
     {
       "id": "R-003",
       "product": "Cough Syrup 100ml",
-      "warehouse": "Hyderabad WH",
+      "warehouse": "Imphal WH",
       "type": "Excess Inventory",
       "badgeClass": "excess",
       "quantity": "3,600 Units",
@@ -133,7 +133,7 @@
     {
       "id": "R-004",
       "product": "Vitamin D3 60K Tablet",
-      "warehouse": "Delhi WH",
+      "warehouse": "Agartala WH",
       "type": "Demand Surge",
       "badgeClass": "surge",
       "quantity": "2,100 Units",
@@ -225,7 +225,7 @@
   "recommendations": [
     {
       "title": "Transfer 900 units Paracetamol 650mg",
-      "subtitle": "from Chennai WH to Bengaluru WH",
+      "subtitle": "from Guwahati WH to Shillong WH",
       "benefit": "₹2.45 Lakh",
       "icon": "⇄"
     },
@@ -237,7 +237,7 @@
     },
     {
       "title": "Create Promotion for Cough Syrup 100ml",
-      "subtitle": "in South Region",
+      "subtitle": "in North East region",
       "benefit": "₹0.85 Lakh",
       "icon": "⚑"
     }
@@ -272,9 +272,10 @@
     },
     {
       "role": "assistant",
-      "text": "Here are the top expiry risks and recommended actions:\n\n1. Paracetamol 650mg (Batch B2456)\n• 2,450 units expiring in 45 days\n• Recommend: Transfer to Bengaluru (900 units) and Hyderabad (600 units)\n\n2. Azithromycin 500mg (Batch A1254)\n• 1,800 units expiring in 60 days\n• Recommend: Promote with 10% discount in South region",
+      "text": "Here are the top expiry risks and recommended actions:\n\n1. Paracetamol 650mg (Batch B2456)\n• 2,450 units expiring in 45 days\n• Recommend: Transfer to Shillong (900 units) and Imphal (600 units)\n\n2. Azithromycin 500mg (Batch A1254)\n• 1,800 units expiring in 60 days\n• Recommend: Promote with 10% discount in North East region",
       "timestamp": "10:30 AM"
     }
   ]
 }
+
 
