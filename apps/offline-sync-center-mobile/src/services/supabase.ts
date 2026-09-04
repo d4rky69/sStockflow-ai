@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Same config as the main website (runtime-config.js)
-const supabaseUrl = 'https://wmhqqpcppsirmzstzvem.supabase.co';
-const supabaseKey = 'sb_publishable_VbokG_IEVn_ydRo9Wwvx9Q_OzLKJpoi';
+// Load from environment variables (e.g. .env.local)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
